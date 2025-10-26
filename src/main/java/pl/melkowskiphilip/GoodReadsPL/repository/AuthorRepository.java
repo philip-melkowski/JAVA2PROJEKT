@@ -16,7 +16,7 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
     List<Author> findByNameContainingIgnoreCase(String part);
     boolean existsByNameAndSurname(String name, String surname);
 
-    // zwraca np.: [J.K. Rowling, 7]
+    // zwraca np.: [J.K. Rowling, 7] 7 to ilosc ksiazek autora
     @Query("SELECT a, size(a.books) FROM Author a")
     List<Object[]> findAuthorsWithBookCount();
 

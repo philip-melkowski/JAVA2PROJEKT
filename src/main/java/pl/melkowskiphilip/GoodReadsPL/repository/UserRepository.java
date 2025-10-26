@@ -28,8 +28,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT AVG(size(u.reviews)) FROM User u")
     Double findAverageReviewCount();
 
-    // liczba recenzji danego uzytkownika - ?1 wybiera pierwszy parametr metody - tutaj id
-    @Query("SELECT size(u.reviews) FROM User u WHERE u.id = ?1")
+    // liczba recenzji danego uzytkownika
+    @Query("SELECT size(u.reviews) FROM User u WHERE u.id = :id")
     Integer findReviewCount(Long id);
 
 

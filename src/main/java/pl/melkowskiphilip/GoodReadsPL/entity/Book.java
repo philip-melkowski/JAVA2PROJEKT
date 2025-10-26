@@ -27,7 +27,9 @@ public class Book {
 
     private String title;
 
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Genre genre;
 
     private LocalDate publishDate;
 
