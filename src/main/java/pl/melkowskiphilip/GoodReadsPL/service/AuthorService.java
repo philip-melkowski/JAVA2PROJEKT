@@ -3,11 +3,13 @@ package pl.melkowskiphilip.GoodReadsPL.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.melkowskiphilip.GoodReadsPL.dto.AuthorDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Author;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +19,17 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
 
     // 🔹 Pobranie wszystkich autorów
-    public List<Author> findAll() {
-        return authorRepository.findAll();
+    public List<AuthorDTO> findAll() {
+        return authorRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // 🔹 Pobranie autora po ID
-    public Optional<Author> findById(Long id) {
-        return authorRepository.findById(id);
+    public AuthorDTO findById(Long id) {
+        return authorRepository.findById(id)
+                .map(this::toDTO)
+                .orElse(null);
     }
 
     // 🔹 Wyszukanie autora po imieniu i nazwisku
@@ -32,13 +38,19 @@ public class AuthorService {
     }
 
     // 🔹 Wyszukiwanie po fragmencie nazwiska (np. "row" → "Rowling")
-    public List<Author> searchBySurnamePart(String part) {
-        return authorRepository.findBySurnameContainingIgnoreCase(part);
+    public List<AuthorDTO> searchBySurnamePart(String part) {
+        return authorRepository.findBySurnameContainingIgnoreCase(part)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // 🔹 Wyszukiwanie po fragmencie imienia
-    public List<Author> searchByNamePart(String part) {
-        return authorRepository.findByNameContainingIgnoreCase(part);
+    public List<AuthorDTO> searchByNamePart(String part) {
+        return authorRepository.findByNameContainingIgnoreCase(part)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // 🔹 Sprawdzenie, czy autor już istnieje
@@ -48,11 +60,12 @@ public class AuthorService {
 
     // 🔹 Dodanie nowego autora (jeśli nie istnieje)
     @Transactional
-    public Author addAuthor(Author author) {
-        if (authorRepository.existsByNameAndSurname(author.getName(), author.getSurname())) {
-            throw new IllegalStateException("Autor o tym imieniu i nazwisku już istnieje");
-        }
-        return authorRepository.save(author);
+    public AuthorDTO saveFromDTO(AuthorDTO dto) {
+        Author author = new Author();
+        author.setName(dto.getName());
+        author.setSurname(dto.getSurname());
+        Author saved = authorRepository.save(author);
+        return toDTO(saved);
     }
 
     // 🔹 Usunięcie autora
@@ -67,7 +80,19 @@ public class AuthorService {
     }
 
     // 🔹 Najpopularniejsi autorzy (po liczbie książek)
-    public List<Author> findTopAuthorsByBookCount() {
-        return authorRepository.findTopAuthorsByBookCount();
+    public List<AuthorDTO> findTopAuthorsByBookCount() {
+        return authorRepository.findTopAuthorsByBookCount()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public AuthorDTO toDTO(Author author) {
+        AuthorDTO dto = new AuthorDTO();
+        dto.setId(author.getId());
+        dto.setName(author.getName());
+        dto.setSurname(author.getSurname());
+
+        return dto;
     }
 }
