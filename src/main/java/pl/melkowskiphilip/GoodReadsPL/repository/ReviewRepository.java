@@ -22,7 +22,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.book.id = :bookId")
     Double findAverageRatingForBook(Long bookId);
      */
+    // Zwraca wszystkie recenzje, gdzie book.id = :bookId i comment IS NOT NULL
+    List<Review> findAllByBookIdAndCommentIsNotNull(Long bookId);
 
-
-
+    // Zwraca wszystkie recenzje książki o określonej ocenie (rating = x), które mają komentarz
+    List<Review> findAllByBookIdAndRatingAndCommentIsNotNull(Long bookId, int rating);
 }

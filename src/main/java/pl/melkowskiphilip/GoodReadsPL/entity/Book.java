@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +31,8 @@ public class Book {
     @Column(nullable = false)
     private Genre genre;
 
-    private LocalDate publishDate;
+
+    private Year publishYear;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
