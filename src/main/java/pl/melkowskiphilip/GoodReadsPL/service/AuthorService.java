@@ -32,33 +32,13 @@ public class AuthorService {
                 .orElse(null);
     }
 
-    // 🔹 Wyszukanie autora po imieniu i nazwisku
-    public Optional<Author> findByNameAndSurname(String name, String surname) {
-        return authorRepository.findByNameAndSurname(name, surname);
-    }
 
-    // 🔹 Wyszukiwanie po fragmencie nazwiska (np. "row" → "Rowling")
-    public List<AuthorDTO> searchBySurnamePart(String part) {
-        return authorRepository.findBySurnameContainingIgnoreCase(part)
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    // 🔹 Wyszukiwanie po fragmencie imienia
-    public List<AuthorDTO> searchByNamePart(String part) {
-        return authorRepository.findByNameContainingIgnoreCase(part)
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    // 🔹 Sprawdzenie, czy autor już istnieje
+    // Sprawdzenie, czy autor już istnieje
     public boolean existsByNameAndSurname(String name, String surname) {
         return authorRepository.existsByNameAndSurname(name, surname);
     }
 
-    // 🔹 Dodanie nowego autora (jeśli nie istnieje)
+    // Dodanie nowego autora (jeśli nie istnieje)
     @Transactional
     public AuthorDTO saveFromDTO(AuthorDTO dto) {
         Author author = new Author();

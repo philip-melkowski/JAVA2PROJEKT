@@ -14,5 +14,10 @@
         //   średnia ocen
         @Query("SELECT AVG(r.rating) FROM Review r WHERE r.book.id = :bookId")
         Double findAverageRatingForBook(Long bookId);
+
+        // sprawdza czy istnieje juz ksiazka
+        boolean existsByTitleAndAuthorId(String title, Long authorId);
     }
+
+
 

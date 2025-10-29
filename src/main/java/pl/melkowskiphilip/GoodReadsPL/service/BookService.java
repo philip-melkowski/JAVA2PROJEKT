@@ -38,6 +38,11 @@ public class BookService {
     //  Zapis nowej książki
     @Transactional // odczyt i zapis zmian
     public BookDTO saveFromDTO(BookDTO dto) {
+        boolean exists = bookRepository.existsByTitleAndAuthorId(dto.getTitle(), dto.getAuthorId());
+        if(exists)
+        {
+            throw new IllegalArgumentException("Ksiazka juz istnieje w bazie");
+        }
         Book book = new Book();
         book.setTitle(dto.getTitle());
         book.setGenre(dto.getGenre());
