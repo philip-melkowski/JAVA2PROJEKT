@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 public class AuthorDTO {
 
-
+    // przy ID nie dawac adnotacji @NotNull - bo przy POST to pole bedzie zawsze NULL
     private Long id;
     @Size(max = 50, message = "Imie autora nie może byc dłuższe niż 50 znaków")
     private String name;

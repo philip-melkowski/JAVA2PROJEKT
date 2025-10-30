@@ -18,7 +18,9 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50)
     private String name;
+    @Column(nullable = false, length = 50)
     private String surname;
 
     // cascadeType.ALL -    Jeśli coś robię na encji rodzica, to wykonaj to samo na dzieciach

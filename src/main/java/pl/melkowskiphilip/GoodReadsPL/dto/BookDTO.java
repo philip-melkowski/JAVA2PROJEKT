@@ -16,8 +16,8 @@ import java.time.Year;
 public class BookDTO {
     private Long id;
 
-    @Size(max = 200, message = "Książka musi mieć tytuł")
-    @NotBlank
+    @Size(max = 200, message = "Tytuł może mieć max 200 znaków długości")
+    @NotBlank(message = "Książka musi mieć tytuł")
     private String title;
 
     // genre moze byc puste
@@ -26,14 +26,13 @@ public class BookDTO {
     // rok publikacji moze byc pusty
     private Year publishYear;
 
-    @NotBlank
+    @NotBlank(message = "musi byc podane ID autora")
     private Long authorId;
 
     @Size(max = 50, message = "Imie autora może miec max 50 znaków długości")
     private String authorName;  // np. "J.K."
 
     @Size(max = 50, message = "Nazwisko autora może miec max 50 znaków długości")
-    @NotBlank
     private String authorSurname; // np. " Rowling"
     private Double averageRating;
 }
