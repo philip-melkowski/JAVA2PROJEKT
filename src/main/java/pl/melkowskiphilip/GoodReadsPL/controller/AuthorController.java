@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.AuthorDTO;
 import pl.melkowskiphilip.GoodReadsPL.service.AuthorService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -16,12 +17,15 @@ public class AuthorController {
 
     private final AuthorService authorService;
 
+    // pobranie listy wszystkich autorow
     @GetMapping
     public ResponseEntity<List<AuthorDTO>> getAllAuthors()
     {
         return ResponseEntity.ok(authorService.findAll());
     }
 
+
+    // pobranie autora po id
     @GetMapping("/{id}")
     public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable Long id)
     {
@@ -32,15 +36,16 @@ public class AuthorController {
         return ResponseEntity.ok(author);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity addAuthor(@PathVariable Long id, @RequestBody AuthorDTO authorDTO)
-    {
-        if (authorService.existsByNameAndSurname(authorDTO.getName(), authorDTO.getSurname())) {
-            return ResponseEntity.
-        }
-        return ResponseEntity.ok(authorService.saveFromDTO(authorDTO));
-    }
 
+        // dodanie autora
+        @PostMapping
+        public ResponseEntity<AuthorDTO> addAuthor(@Valid @RequestBody AuthorDTO authorDTO)
+        {
+            return ResponseEntity.ok(authorService.saveFromDTO(authorDTO));
+        }
+
+
+        // usuniecie autora po id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthorById(@PathVariable Long id)
     {
@@ -48,5 +53,18 @@ public class AuthorController {
         return ResponseEntity.noContent().build();
     }
 
+    // update autora
+    @PutMapping("/{id}")
+    public ResponseEntity<AuthorDTO> updateAuthor(@PathVariable Long id, @Valid @RequestBody AuthorDTO updatedAuthor)
+    {
+        return ResponseEntity.ok(authorService.updateAuthor(id, updatedAuthor));
+    }
+
+    // wypisanie autorow po fragmencie w imieniu lub nazwisku
+    @GetMapping("/search")
+    public ResponseEntity<List<AuthorDTO>> findByNameOrSurnameContainingCaseInsensitive(@RequestParam String fragment)
+    {
+        return ResponseEntity.ok(authorService.findByNameOrSurnameContainingCaseInsensitive(fragment));
+    }
 
 }

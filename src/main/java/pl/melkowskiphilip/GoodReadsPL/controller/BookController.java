@@ -7,6 +7,7 @@ import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
 import pl.melkowskiphilip.GoodReadsPL.service.BookService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class BookController {
 
     // dodaje ksiazki, jesli nie istnieje jeszce
     @PostMapping
-    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> addBook(@Valid @RequestBody BookDTO bookDTO) {
         return ResponseEntity.ok(bookService.saveFromDTO(bookDTO));
     }
 
@@ -90,7 +91,7 @@ public class BookController {
 
     // aktualizacja ksiazki
     @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO updatedBook) {
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @Valid @RequestBody BookDTO updatedBook) {
         return ResponseEntity.ok(bookService.updateBook(id, updatedBook));
     }
 

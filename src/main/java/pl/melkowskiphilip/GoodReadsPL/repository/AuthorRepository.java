@@ -10,9 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
-    Optional<Author> findByNameAndSurname(String name, String surname);
-    List<Author> findBySurnameContainingIgnoreCase(String part);
-    List<Author> findByNameContainingIgnoreCase(String part);
+
+    // autorzy ktorzy maja fragment w imieniu lub nazwisku
+    @Query("SELECT a FROM Author a where LOWER(a.name) LIKE LOWER(CONCAT('%', :part, '%'))" +
+            "OR LOWER(a.surname) LIKE LOWER(CONCAT('%', :part, '%'))")
+    List<Author> findByNameOrSurnameContainingIgnoreCase(String part);
+
+    // czy istnieje autor - zeby nie dodawac duplikatu
     boolean existsByNameAndSurname(String name, String surname);
 
 

@@ -8,7 +8,6 @@ import pl.melkowskiphilip.GoodReadsPL.entity.Author;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,15 +31,23 @@ public class AuthorService {
                 .orElse(null);
     }
 
-
-    // Sprawdzenie, czy autor już istnieje
-    public boolean existsByNameAndSurname(String name, String surname) {
-        return authorRepository.existsByNameAndSurname(name, surname);
+    // pobranie autorow po fragmencie w imieniu lub nazwisku
+    public List<AuthorDTO> findByNameOrSurnameContainingCaseInsensitive(String fragment) {
+        return authorRepository.findByNameOrSurnameContainingIgnoreCase(fragment)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
+
 
     // Dodanie nowego autora (jeśli nie istnieje)
     @Transactional
     public AuthorDTO saveFromDTO(AuthorDTO dto) {
+        boolean exists = authorRepository.existsByNameAndSurname(dto.getName(), dto.getSurname());
+        if(exists)
+        {
+            throw new IllegalArgumentException("Autor juz istnieje w bazie");
+        }
         Author author = new Author();
         author.setName(dto.getName());
         author.setSurname(dto.getSurname());
@@ -54,18 +61,19 @@ public class AuthorService {
         authorRepository.deleteById(id);
     }
 
-    // 🔹 Lista autorów z liczbą książek
-    public List<Object[]> findAuthorsWithBookCount() {
-        return authorRepository.findAuthorsWithBookCount();
+
+    // aktualizacja danych autora
+    @Transactional
+    public AuthorDTO updateAuthor(Long id, AuthorDTO updatedAuthor)
+    {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono autora o ID " + id));
+        author.setName(updatedAuthor.getName());
+        author.setSurname(updatedAuthor.getSurname());
+        return toDTO(authorRepository.save(author));
     }
 
-    // 🔹 Najpopularniejsi autorzy (po liczbie książek)
-    public List<AuthorDTO> findTopAuthorsByBookCount() {
-        return authorRepository.findTopAuthorsByBookCount()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
+
 
     public AuthorDTO toDTO(Author author) {
         AuthorDTO dto = new AuthorDTO();
@@ -75,4 +83,6 @@ public class AuthorService {
 
         return dto;
     }
+
+
 }
