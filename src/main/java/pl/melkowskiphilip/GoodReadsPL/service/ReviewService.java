@@ -24,7 +24,7 @@ public class ReviewService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
-    // 🔹 Wszystkie recenzje
+    //  Wszystkie recenzje
     public List<ReviewDTO> findAll() {
         return reviewRepository.findAll()
                 .stream()
@@ -32,7 +32,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // 🔹 Recenzje konkretnej książki
+    //  Recenzje konkretnej książki
     public List<ReviewDTO> findAllByBook(Long bookId) {
         return reviewRepository.findAllByBookId(bookId)
                 .stream()
@@ -40,7 +40,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // 🔹 Recenzje konkretnego użytkownika
+    //  Recenzje konkretnego użytkownika
     public List<ReviewDTO> findAllByUser(Long userId) {
         return reviewRepository.findAllByUserId(userId)
                 .stream()
@@ -48,18 +48,14 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // 🔹 Jedna recenzja konkretnego użytkownika dla konkretnej książki
+    //  Jedna recenzja konkretnego użytkownika dla konkretnej książki
     public ReviewDTO findByBookAndUser(Long bookId, Long userId) {
         Optional<Review> rev = reviewRepository.findByBookIdAndUserId(bookId, userId);
         return rev.map(this::toDTO).orElse(null);
     }
 
-    // 🔹 Sprawdzenie, czy użytkownik już ocenił książkę
-    public boolean existsByBookAndUser(Long bookId, Long userId) {
-        return reviewRepository.existsByBookIdAndUserId(bookId, userId);
-    }
 
-    // 🔹 Dodanie nowej recenzji (z kontrolą duplikatów)
+    //  Dodanie nowej recenzji (z kontrolą duplikatów)
     @Transactional
     public ReviewDTO saveReview(ReviewDTO dto) {
 
@@ -82,7 +78,7 @@ public class ReviewService {
         review.setBook(book);
         review.setUser(user);
 
-        // createdAt ustawi się automatycznie w encji (masz domyślnie = LocalDateTime.now())
+        // createdAt ustawi się automatycznie w encji (domyślnie = LocalDateTime.now())
 
         // 4️⃣ Zapis w bazie
         Review saved = reviewRepository.save(review);
@@ -91,7 +87,7 @@ public class ReviewService {
         return toDTO(saved);
     }
 
-    // 🔹 Aktualizacja istniejącej recenzji
+    //  Aktualizacja istniejącej recenzji
     @Transactional
     public ReviewDTO updateReview(ReviewDTO review) {
         if (review.getId() == null) {
@@ -105,24 +101,26 @@ public class ReviewService {
         return toDTO(reviewRepository.save(existingReview));
     }
 
-    // 🔹 Usunięcie recenzji
+    //  Usunięcie recenzji
     @Transactional
     public void deleteById(Long id) {
         reviewRepository.deleteById(id);
     }
 
-    // 🔹 Recenzje z komentarzem dla danej książki
+    //  Recenzje z komentarzem dla danej książki
     public List<ReviewDTO> findReviewsWithComments(Long bookId) {
         return reviewRepository.findAllByBookIdAndCommentIsNotNull(bookId)
                 .stream()
+                .filter(r -> r.getComment() != null && !r.getComment().trim().isEmpty())  // dodatkowo usuwamy komentarze takie: ""
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // 🔹 Recenzje z komentarzem i daną oceną dla danej książki
+    //  Recenzje z komentarzem i daną oceną dla danej książki
     public List<ReviewDTO> findReviewsWithCommentsByRating(Long bookId, int rating) {
         return reviewRepository.findAllByBookIdAndRatingAndCommentIsNotNull(bookId, rating)
                 .stream()
+                .filter(r -> r.getComment() != null && !r.getComment().trim().isEmpty())  // dodatkowo usuwamy komentarze takie: ""
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -132,6 +130,7 @@ public class ReviewService {
         if(review == null) return null;
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
+        dto.setUsername(review.getUser().getUsername());
         dto.setBookTitle(review.getBook().getTitle());
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
