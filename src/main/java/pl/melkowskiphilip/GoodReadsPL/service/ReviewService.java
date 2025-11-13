@@ -83,6 +83,14 @@ public class ReviewService {
         // 4️⃣ Zapis w bazie
         Review saved = reviewRepository.save(review);
 
+
+        user.getReadBooks().add(book); // dodanie ksiazki jako przeczytanej dla uzytkownika
+        book.getReaders().add(user); // dodanie uztykotwnika jako czytelnika
+        book.getReviews().add(saved); // dodanie recenzji dla ksiazki
+        userRepository.save(user); // zapisujemy po stronie "owning side" w przypadku relacji many to many
+
+
+
         // 5️⃣ Zwrócenie DTO (mapowanie encji na DTO)
         return toDTO(saved);
     }
@@ -104,7 +112,21 @@ public class ReviewService {
     //  Usunięcie recenzji
     @Transactional
     public void deleteById(Long id) {
-        reviewRepository.deleteById(id);
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono recenzji o ID " + id));
+
+        User user = review.getUser();
+        Book book = review.getBook();
+
+        // usuniecie ksiazki z przeczytanych
+        user.getReadBooks().remove(book);
+        // usuniecie uzyktownika z przeczytanych
+        book.getReaders().remove(user);
+
+        // zapisanie po stronie owning side
+        userRepository.save(user);
+
+        reviewRepository.delete(review);
     }
 
     //  Recenzje z komentarzem dla danej książki
