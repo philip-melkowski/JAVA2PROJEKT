@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Data // Z Lomboka – generuje automatycznie: gettery, settery, equals(),
-// hashCode(), toString(). Nie musisz ich pisać ręcznie.
+// hashCode(), toString(). Nie trzeba ich pisać ręcznie.
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthorDTO {
