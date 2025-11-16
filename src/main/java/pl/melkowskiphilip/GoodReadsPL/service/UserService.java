@@ -3,12 +3,14 @@ package pl.melkowskiphilip.GoodReadsPL.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
+import pl.melkowskiphilip.GoodReadsPL.dto.UserRegisterDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Role;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,54 +19,70 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // 🔹 Pobranie wszystkich użytkowników
-    public List<User> findAll() {
-        return userRepository.findAll();
+    // Pobranie wszystkich użytkowników
+    public List<UserDTO> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    // 🔹 Pobranie użytkownika po ID
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    // Pobranie użytkownika po ID
+    public UserDTO findById(Long id) {
+        return userRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow( () ->
+                        new IllegalArgumentException("Uzytkownik o ID " + id + " nie istnieje"));
     }
 
-    // 🔹 Pobranie użytkownika po loginie
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+
+    // Pobranie użytkownika po loginie (bez względu na wielkość liter)
+    public UserDTO findByUsernameIgnoreCase(String username) {
+        return userRepository.findByUsernameIgnoreCase(username)
+                .map(this::toDTO)
+                .orElseThrow( () ->
+                        new IllegalArgumentException("Uzytkownik o loginie " + username + " nie istnieje case insensitive"));
     }
 
-    // 🔹 Pobranie użytkownika po loginie (bez względu na wielkość liter)
-    public Optional<User> findByUsernameIgnoreCase(String username) {
-        return userRepository.findByUsernameIgnoreCase(username);
+    // Pobranie użytkownika po e-mailu
+    public UserDTO findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(this::toDTO)
+                .orElseThrow( () ->
+                        new IllegalArgumentException("Uzytkownik o adresie e-mail " + email + " nie istnieje"));
     }
 
-    // 🔹 Pobranie użytkownika po e-mailu
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    // 🔹 Sprawdzenie, czy e-mail istnieje w bazie
+    // Sprawdzenie, czy e-mail istnieje w bazie
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    // 🔹 Sprawdzenie, czy login istnieje w bazie
+    // Sprawdzenie, czy login istnieje w bazie
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 
-    // 🔹 Zapis nowego użytkownika
+    // Zapis nowego użytkownika
     @Transactional
-    public User save(User user) {
-        if (existsByEmail(user.getEmail())) {
+    public UserDTO save(UserRegisterDTO dto) {
+        if (existsByEmail(dto.getEmail())) {
             throw new IllegalStateException("Adres e-mail jest już zajęty!");
         }
-        if (existsByUsername(user.getUsername())) {
+        if (existsByUsername(dto.getUsername())) {
             throw new IllegalStateException("Nazwa użytkownika jest już zajęta!");
         }
-        return userRepository.save(user);
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        // tutaj zwykłe hasło, dopóki nie dodamy PasswordEncoder
+        user.setPassword(dto.getPassword());
+        user.setEnabled(false);
+        user.setRole(Role.USER);
+        User saved = userRepository.save(user);
+        return toDTO(saved);
     }
 
-    // 🔹 Usunięcie użytkownika
+    // Usunięcie użytkownika
     @Transactional
     public void deleteById(Long id) {
         userRepository.deleteById(id);
@@ -72,9 +90,10 @@ public class UserService {
 
     // aktualizacja użytkownika, np. po klikneiciu maila do aktywacji konta
     @Transactional
-    public User updateUser(Long id, User updatedUser) {
+    public UserDTO updateUser(Long id, UserDTO updatedUser) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Użytkownik o ID " + id + " nie istnieje"));
+
 
         // Przykład: aktywacja konta po kliknięciu w link
         if (updatedUser.isEnabled() != existingUser.isEnabled()) {
@@ -89,26 +108,32 @@ public class UserService {
             existingUser.setEmail(updatedUser.getEmail());
         }
 
-        // zmiana hasla
-        if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(updatedUser.getPassword());
-        }
+        User saved = userRepository.save(existingUser);
 
-        return userRepository.save(existingUser);
+        return toDTO(saved);
     }
 
-    // 🔹 Wyszukanie użytkowników po roli (USER / ADMIN)
-    public List<User> findAllByRole(Role role) {
-        return userRepository.findAllByRole(role);
-    }
 
-    // 🔹 Średnia liczba recenzji przypadająca na użytkownika
+    // Średnia liczba recenzji przypadająca na użytkownika
     public Double findAverageReviewCount() {
         return userRepository.findAverageReviewCount();
     }
 
-    // 🔹 Liczba recenzji danego użytkownika
+    // Liczba recenzji danego użytkownika
     public Integer findReviewCount(Long id) {
         return userRepository.findReviewCount(id);
+    }
+
+    // User -> UserDTO
+    public UserDTO toDTO(User user)
+    {
+        if(user == null) return null;
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole());
+        dto.setEnabled(user.isEnabled());
+        return dto;
     }
 }

@@ -15,4 +15,6 @@ public class UserDTO {
     private boolean enabled;
 
     private Role role;
+
+
 }
