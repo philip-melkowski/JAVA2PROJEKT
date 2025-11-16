@@ -11,6 +11,6 @@ public class ChangePasswordDTO {
     private String oldPassword;
 
     @NotBlank(message = "Nowe hasło jest wymagane.")
-    @Size(min = 8, message = "Nowe hasło musi mieć co najmniej 8 znaków.")
+    @Size(min = 8, max = 64, message = "Hasło musi mieć co najmniej 8 znaków.")
     private String newPassword;
 }

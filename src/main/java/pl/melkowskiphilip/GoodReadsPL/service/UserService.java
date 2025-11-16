@@ -1,6 +1,7 @@
 package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Pobranie wszystkich użytkowników
     public List<UserDTO> findAll() {
@@ -74,8 +76,8 @@ public class UserService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        // tutaj zwykłe hasło, dopóki nie dodamy PasswordEncoder
-        user.setPassword(dto.getPassword());
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setEnabled(false);
         user.setRole(Role.USER);
         User saved = userRepository.save(user);

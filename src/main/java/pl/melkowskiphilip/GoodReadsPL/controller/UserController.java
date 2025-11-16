@@ -1,5 +1,6 @@
 package pl.melkowskiphilip.GoodReadsPL.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class UserController {
 
     // dodanie uzytkownika
     @PostMapping
-    public ResponseEntity<UserDTO> saveUser(@RequestBody UserRegisterDTO user)
+    public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserRegisterDTO user)
     {
         return ResponseEntity.ok(userService.save(user));
     }
