@@ -29,13 +29,18 @@ public class UserController {
     @GetMapping("/findByEmail/{email}")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) { return ResponseEntity.ok(userService.findByEmail(email)); }
 
+    @GetMapping("/avgRevCount")
+    public ResponseEntity<Double> getAvgRevCount()
+    {
+        return ResponseEntity.ok(userService.findAverageReviewCount());
+    }
+
+    @GetMapping("revCount/{id}")
+    public ResponseEntity<Integer> getRevCount(@PathVariable Long id)  { return ResponseEntity.ok(userService.findReviewCount(id)); }
 
     // dodanie uzytkownika
     @PostMapping
-    public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserRegisterDTO user)
-    {
-        return ResponseEntity.ok(userService.save(user));
-    }
+    public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserRegisterDTO user) { return ResponseEntity.ok(userService.save(user)); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable Long id)
@@ -45,22 +50,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUser)
-    {
-        return ResponseEntity.ok(userService.updateUser(id, updatedUser));
-    }
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUser) { return ResponseEntity.ok(userService.updateUser(id, updatedUser)); }
 
-    @GetMapping("/avgRevCount")
-    public ResponseEntity<Double> getAvgRevCount()
-    {
-        return ResponseEntity.ok(userService.findAverageReviewCount());
-    }
 
-    @GetMapping("revCount/{id}")
-    public ResponseEntity<Integer> getRevCount(@PathVariable Long id)
-    {
-        return ResponseEntity.ok(userService.findReviewCount(id));
-    }
 
 
 
