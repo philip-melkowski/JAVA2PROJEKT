@@ -38,9 +38,12 @@ public class UserController {
     @GetMapping("revCount/{id}")
     public ResponseEntity<Integer> getRevCount(@PathVariable Long id)  { return ResponseEntity.ok(userService.findReviewCount(id)); }
 
+    /* rejestracja przeniesiona do auth/AuthController
     // dodanie uzytkownika
     @PostMapping
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserRegisterDTO user) { return ResponseEntity.ok(userService.save(user)); }
+
+     */
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable Long id)

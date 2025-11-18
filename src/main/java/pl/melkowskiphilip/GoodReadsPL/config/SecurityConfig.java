@@ -1,30 +1,54 @@
 package pl.melkowskiphilip.GoodReadsPL.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import pl.melkowskiphilip.GoodReadsPL.security.UserDetailsServiceImpl;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import pl.melkowskiphilip.GoodReadsPL.security.filter.JWTAuthenticationFilter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JWTAuthenticationFilter jwtAuthFilter;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    // 1. AuthenticationManager – potrzebny dla logowania (auth/login)
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    // GŁÓWNA konfiguracja Spring Security
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // CSRF blokuje POST w Postmanie — wyłączamy
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // wszystko dostępne bez logowania (na razie)
+                .csrf(AbstractHttpConfigurer::disable) // REST API → CSRF off
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT → bez sesji
                 )
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+                .authorizeHttpRequests(auth -> auth
+                        // na razie wszystko permit all
+                        .anyRequest().permitAll()
+                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) ->
+                        handlerExceptionResolver.resolveException(req, res, null, e)
+                ))
+                .formLogin(AbstractHttpConfigurer::disable) // wylaczone bo domyslnie podmienia zadanie post na /login na formularz htttp - w frotnedzie REST z react wylaczamy
+                .httpBasic(AbstractHttpConfigurer::disable); // przezytek do autoryzacji basic username:password
 
-    @Bean
-    public UserDetailsService userDetailsService(UserDetailsServiceImpl userDetailsServiceImpl) {
-        return userDetailsServiceImpl;
+
+        // wpiecie filtra tokenem JWT przed UsernamePasswdAuthFilter bo wybierany jest na zasadzie kto pierwszy
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+
+        return http.build();
     }
 }

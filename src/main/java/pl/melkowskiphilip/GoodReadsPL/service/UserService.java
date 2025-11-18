@@ -64,7 +64,9 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    // Zapis nowego użytkownika
+    // niepotrzebne
+    /*
+    // Zapis nowego użytkownika (rejestracja)
     @Transactional
     public UserDTO save(UserRegisterDTO dto) {
         if (existsByEmail(dto.getEmail())) {
@@ -83,6 +85,7 @@ public class UserService {
         User saved = userRepository.save(user);
         return toDTO(saved);
     }
+     */
 
     // Usunięcie użytkownika
     @Transactional
