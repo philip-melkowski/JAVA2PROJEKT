@@ -31,10 +31,10 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("Użytkownik o podanym emailu nie istnieje"));
 
         if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Niepoprawne dane logowania");
+            throw new BadCredentialsException("Niepoprawne dane logowania"); // tutaj dodac w drugim jezyku
         }
         if(!user.isEnabled()) {
-            throw new DisabledException("Konto nie jest aktywne. Aktywuj na mailu.");
+            throw new DisabledException("Konto nie jest aktywne. Aktywuj na mailu."); // tutaj dodac w drugim jezyku
         }
         String token = jwtService.generateToken(user);
         return new LoginResponseDTO(
