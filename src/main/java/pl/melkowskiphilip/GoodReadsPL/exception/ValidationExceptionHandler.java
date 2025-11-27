@@ -14,7 +14,8 @@ import java.util.Map;
 @RestControllerAdvice // - obsluguje wszystkie kontrolery, @Rest mowi ze zwracamy Response Body JSON
 public class ValidationExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class) // jesli gdzies wystapi blad MethArgNValExc - to zrob to w przypadku adnotacji @Valid
+    // jesli gdzies wystapi blad MethArgNValExc - to zrob to w przypadku adnotacji @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
@@ -22,8 +23,9 @@ public class ValidationExceptionHandler {
 
     }
 
+    // wywolywane np. dla dodania autora ktory juz jest w bazie
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) { // wywolywane np. dla dodania autora ktory juz jest w bazie
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity
                 .badRequest()
                 .body(ex.getMessage());
@@ -36,6 +38,7 @@ public class ValidationExceptionHandler {
         return ResponseEntity.status(403).body(ex.getMessage());
     }
 
+    // zle dane logowania
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex)
     {

@@ -64,28 +64,6 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    // niepotrzebne
-    /*
-    // Zapis nowego użytkownika (rejestracja)
-    @Transactional
-    public UserDTO save(UserRegisterDTO dto) {
-        if (existsByEmail(dto.getEmail())) {
-            throw new IllegalStateException("Adres e-mail jest już zajęty!");
-        }
-        if (existsByUsername(dto.getUsername())) {
-            throw new IllegalStateException("Nazwa użytkownika jest już zajęta!");
-        }
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
-
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setEnabled(false);
-        user.setRole(Role.USER);
-        User saved = userRepository.save(user);
-        return toDTO(saved);
-    }
-     */
 
     // Usunięcie użytkownika
     @Transactional
