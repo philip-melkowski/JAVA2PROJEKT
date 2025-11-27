@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.melkowskiphilip.GoodReadsPL.entity.ActivationToken;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.ActivationTokenExpiredException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.InvalidActivationTokenException;
 import pl.melkowskiphilip.GoodReadsPL.repository.ActivationTokenRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
@@ -43,11 +45,11 @@ public class ActivationTokenService {
     public void activateAccount(String token)
     {
         ActivationToken optionalToken = activationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Niepoprawny token aktywacji."));
+                .orElseThrow(() -> new InvalidActivationTokenException("Niepoprawny token aktywacji."));
 
         if(!isTokenValid(optionalToken))
         {
-            throw new IllegalStateException("Token wygasł!");
+            throw new ActivationTokenExpiredException("Token wygasł!");
         }
 
         User user = optionalToken.getUser();

@@ -18,34 +18,43 @@ public class ValidationExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+        return ResponseEntity.status(404).body(ex.getMessage()); // 404 Not Found
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<String> handleInvalidCredentials(InvalidCredentialsException ex) {
-        return ResponseEntity.status(401).body(ex.getMessage());
+        return ResponseEntity.status(401).body(ex.getMessage()); // 401 Unauthorized
     }
 
     @ExceptionHandler(AccountNotActivatedException.class)
     public ResponseEntity<String> handleAccountNotActivated(AccountNotActivatedException ex) {
-        return ResponseEntity.status(403).body(ex.getMessage());
+        return ResponseEntity.status(403).body(ex.getMessage()); // 403 Forbidden
     }
 
     @ExceptionHandler(EmailAlreadyUsedException.class)
     public ResponseEntity<String> handleEmailUsed(EmailAlreadyUsedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
     }
 
     @ExceptionHandler(UsernameAlreadyUsedException.class)
     public ResponseEntity<String> handleUsernameUsed(UsernameAlreadyUsedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
     }
 
     @ExceptionHandler(AccountAlreadyActivatedException.class)
     public ResponseEntity<String> handleAccountAlreadyActive(AccountAlreadyActivatedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
     }
 
+    @ExceptionHandler(InvalidActivationTokenException.class)
+    public ResponseEntity<String> handleInvalidActivationToken(InvalidActivationTokenException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage()); // 400 Bad Request
+    }
+
+    @ExceptionHandler(ActivationTokenExpiredException.class)
+    public ResponseEntity<String> handleActivationTokenExpired(ActivationTokenExpiredException ex) {
+        return ResponseEntity.status(410).body(ex.getMessage()); // 410 Gone — token wygasł
+    }
 
 
     // jesli gdzies wystapi blad MethArgNValExc - to zrob to w przypadku adnotacji @Valid
