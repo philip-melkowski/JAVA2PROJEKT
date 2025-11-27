@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
-import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
 

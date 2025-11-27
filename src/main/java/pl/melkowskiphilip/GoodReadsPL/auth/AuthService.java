@@ -14,6 +14,7 @@ import pl.melkowskiphilip.GoodReadsPL.entity.ActivationToken;
 import pl.melkowskiphilip.GoodReadsPL.entity.Role;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.mail.EmailService;
+import pl.melkowskiphilip.GoodReadsPL.repository.ActivationTokenRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 import pl.melkowskiphilip.GoodReadsPL.security.JWT.JWTService;
 import pl.melkowskiphilip.GoodReadsPL.service.ActivationTokenService;
@@ -28,6 +29,7 @@ public class AuthService {
     private final JWTService jwtService;
     private final UserService userService;
     private final ActivationTokenService activationTokenService;
+    private final ActivationTokenRepository activationTokenRepository;
     private final EmailService emailService;
 
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -38,8 +40,27 @@ public class AuthService {
         if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Niepoprawne dane logowania"); // tutaj dodac w drugim jezyku
         }
+        // jesli nie zostalo aktywowane konto
         if(!user.isEnabled()) {
-            throw new DisabledException("Konto nie jest aktywne. Aktywuj na mailu."); // tutaj dodac w drugim jezyku
+            ActivationToken existing = activationTokenRepository.findByUser(user).orElse(null);
+            ActivationToken token;
+            // jesli token wciaz aktywny to wyslij go
+            if(existing != null && activationTokenService.isTokenValid(existing)) {
+                token = existing;
+            }
+            // jesli nie ist lub nieaktynwy juz - stworz nowy token
+            else
+            {
+                if(existing != null) {
+                    activationTokenRepository.delete(existing);
+                }
+                token = activationTokenService.createTokenForUser(user);
+            }
+            emailService.sendActivationEmail(user, token.getToken());
+
+            throw new DisabledException("Konto nieaktywne - wysłaliśmy mail z linkiem aktywacji");
+
+
         }
         String token = jwtService.generateToken(user);
         return new LoginResponseDTO(

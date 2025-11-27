@@ -24,6 +24,8 @@ public class EmailService {
         sendHtmlEmail(user.getEmail(), subject, htmlMessage);
     }
 
+
+
     private void sendHtmlEmail(String to, String subject, String htmlBody) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

@@ -8,7 +8,6 @@ import pl.melkowskiphilip.GoodReadsPL.repository.ActivationTokenRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,11 +17,7 @@ public class ActivationTokenService {
     private final ActivationTokenRepository activationTokenRepository;
     private final UserRepository userRepository; // do zapisania uzykotwnika do bazy
 
-    // pobranie tokenu z bazy
-    Optional<ActivationToken> findByToken(String token)
-    {
-        return activationTokenRepository.findByToken(token);
-    }
+
 
     // tworzenie tokenu dla użytkownika
     public ActivationToken createTokenForUser(User user)
@@ -36,6 +31,7 @@ public class ActivationTokenService {
 
         return activationTokenRepository.save(token);
     }
+
 
     // sprawdzenie ważności tokenu
     public boolean isTokenValid(ActivationToken token)
@@ -60,4 +56,8 @@ public class ActivationTokenService {
         // jak już zostanie użyty do aktywacji to usuń token z bazy
         activationTokenRepository.delete(optionalToken);
     }
+
+
+
+
 }
