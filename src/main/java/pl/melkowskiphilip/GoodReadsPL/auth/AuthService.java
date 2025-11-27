@@ -94,6 +94,32 @@ public class AuthService {
         return userService.toDTO(newUser);
     }
 
+    public String resendActivationMail(String mail)
+    {
+        User user = userRepository.findByEmail(mail)
+                .orElseThrow( () ->
+                        new IllegalArgumentException("Nie ma konta z takim adresem e-mail: " + mail));
+        if(user.isEnabled()) {
+           throw new IllegalStateException("Konto jest już aktywne!");
+        }
+
+        ActivationToken existing = activationTokenRepository.findByUser(user).orElse(null);
+        ActivationToken token;
+
+        if(existing != null && activationTokenService.isTokenValid(existing)) {
+            token = existing;
+        }
+        else
+        {
+            if(existing != null) {
+                activationTokenRepository.delete(existing);
+            }
+            token = activationTokenService.createTokenForUser(user);
+        }
+        emailService.sendActivationEmail(user, token.getToken());
+
+        return "Wysłano ponownie mail z linkiem aktywacji!";
+    }
+    }
 
 
-}

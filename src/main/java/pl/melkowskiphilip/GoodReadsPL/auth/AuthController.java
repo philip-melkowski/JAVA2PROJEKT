@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.melkowskiphilip.GoodReadsPL.dto.LoginRequestDTO;
-import pl.melkowskiphilip.GoodReadsPL.dto.LoginResponseDTO;
-import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
-import pl.melkowskiphilip.GoodReadsPL.dto.UserRegisterDTO;
+import pl.melkowskiphilip.GoodReadsPL.dto.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,5 +28,12 @@ public class AuthController {
     public ResponseEntity<UserDTO> register(@Valid @RequestBody UserRegisterDTO user) {
         UserDTO registeredUser = authService.register(user);
         return ResponseEntity.ok(registeredUser);
+    }
+
+
+    // ponowne wysłanie maila aktywującego konto
+    @PostMapping("/resendActivationMail")
+    public ResponseEntity<String> resendActivationMail(@Valid @RequestBody ResendActivationDTO mail) {
+        return ResponseEntity.ok(authService.resendActivationMail(mail.getEmail()));
     }
 }
