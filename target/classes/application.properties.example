@@ -12,3 +12,13 @@ spring.messages.encoding=UTF-8
 
 jwt.secret=KEY
 jwt.expiration=900000
+
+
+# mail - mailtrap na czas dewelopmentu
+spring.mail.host=smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=TWÓJ_LOGIN_Z_MAILTRAP
+spring.mail.password=TWÓJ_HASŁO_Z_MAILTRAP
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.from=no-reply@goodreadspl.com

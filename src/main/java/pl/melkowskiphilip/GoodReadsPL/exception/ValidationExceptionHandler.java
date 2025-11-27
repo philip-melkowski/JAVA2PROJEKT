@@ -1,6 +1,6 @@
 package pl.melkowskiphilip.GoodReadsPL.exception;
 
-import org.springframework.http.HttpStatus;
+import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -38,11 +38,18 @@ public class ValidationExceptionHandler {
         return ResponseEntity.status(403).body(ex.getMessage());
     }
 
-    // zle dane logowania
+    // złe dane logowania
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex)
     {
         return ResponseEntity.status(401).body(ex.getMessage());
+    }
+
+    // np. przy niepowodzeniu przy wyslaniu maila
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalState(IllegalStateException ex)
+    {
+        return ResponseEntity.status(500).body(ex.getMessage());
     }
 
 }

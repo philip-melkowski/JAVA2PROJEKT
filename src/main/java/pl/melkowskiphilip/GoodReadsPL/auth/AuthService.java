@@ -10,10 +10,13 @@ import pl.melkowskiphilip.GoodReadsPL.dto.LoginRequestDTO;
 import pl.melkowskiphilip.GoodReadsPL.dto.LoginResponseDTO;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserRegisterDTO;
+import pl.melkowskiphilip.GoodReadsPL.entity.ActivationToken;
 import pl.melkowskiphilip.GoodReadsPL.entity.Role;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.mail.EmailService;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 import pl.melkowskiphilip.GoodReadsPL.security.JWT.JWTService;
+import pl.melkowskiphilip.GoodReadsPL.service.ActivationTokenService;
 import pl.melkowskiphilip.GoodReadsPL.service.UserService;
 
 @Service
@@ -24,6 +27,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
     private final UserService userService;
+    private final ActivationTokenService activationTokenService;
+    private final EmailService emailService;
 
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user =
@@ -52,6 +57,7 @@ public class AuthService {
         if(userRepository.existsByUsername(user.getUsername())) {
             throw new IllegalStateException("Istnieje już konto z podaną nazwą użytkownika");
         }
+
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setUsername(user.getUsername());
@@ -59,6 +65,11 @@ public class AuthService {
         newUser.setEnabled(false);
         newUser.setRole(Role.USER);
         userRepository.save(newUser);
+
+        ActivationToken token = activationTokenService.createTokenForUser(newUser);
+        emailService.sendActivationEmail(newUser, token.getToken());
+
+
         return userService.toDTO(newUser);
     }
 
