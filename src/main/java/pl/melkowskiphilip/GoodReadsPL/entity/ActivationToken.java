@@ -33,7 +33,7 @@ public class ActivationToken {
     @Column(nullable = false)
     private LocalDateTime expiresAt = LocalDateTime.now().plusDays(7);
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

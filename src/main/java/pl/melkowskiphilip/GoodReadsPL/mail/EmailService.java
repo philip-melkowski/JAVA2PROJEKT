@@ -16,7 +16,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     public void sendActivationEmail(User user, String token) {
-        String activationLink = "http://localhost:8080/api/auth/activate?token=" + token;
+        String activationLink = "http://localhost:8080/api/auth/activation?token=" + token;
 
         String subject = "Aktywacja konta w GoodReadsPL";
         String htmlMessage = buildActivationEmail(user.getUsername(), activationLink);
