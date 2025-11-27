@@ -1,9 +1,6 @@
 package pl.melkowskiphilip.GoodReadsPL.auth;
 
-import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.melkowskiphilip.GoodReadsPL.dto.LoginRequestDTO;
@@ -13,6 +10,7 @@ import pl.melkowskiphilip.GoodReadsPL.dto.UserRegisterDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.ActivationToken;
 import pl.melkowskiphilip.GoodReadsPL.entity.Role;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.*;
 import pl.melkowskiphilip.GoodReadsPL.mail.EmailService;
 import pl.melkowskiphilip.GoodReadsPL.repository.ActivationTokenRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
@@ -21,7 +19,7 @@ import pl.melkowskiphilip.GoodReadsPL.service.ActivationTokenService;
 import pl.melkowskiphilip.GoodReadsPL.service.UserService;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -35,10 +33,10 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user =
                 userRepository.findByEmail(loginRequestDTO.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Użytkownik o podanym emailu nie istnieje"));
+                .orElseThrow(() -> new UserNotFoundException("Użytkownik o podanym emailu nie istnieje"));
 
         if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Niepoprawne dane logowania"); // tutaj dodac w drugim jezyku
+            throw new InvalidCredentialsException("Niepoprawne dane logowania"); // tutaj dodac w drugim jezyku
         }
         // jesli nie zostalo aktywowane konto
         if(!user.isEnabled()) {
@@ -58,7 +56,7 @@ public class AuthService {
             }
             emailService.sendActivationEmail(user, token.getToken());
 
-            throw new DisabledException("Konto nieaktywne - wysłaliśmy mail z linkiem aktywacji");
+            throw new AccountNotActivatedException("Konto nieaktywne - wysłaliśmy mail z linkiem aktywacji");
 
 
         }
@@ -73,10 +71,10 @@ public class AuthService {
 
     public UserDTO register(UserRegisterDTO user) {
         if(userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Istnieje już konto z podanym adresem e-mail");
+            throw new EmailAlreadyUsedException("Istnieje już konto z podanym adresem e-mail");
         }
         if(userRepository.existsByUsername(user.getUsername())) {
-            throw new IllegalStateException("Istnieje już konto z podaną nazwą użytkownika");
+            throw new UsernameAlreadyUsedException("Istnieje już konto z podaną nazwą użytkownika");
         }
 
         User newUser = new User();
@@ -98,9 +96,9 @@ public class AuthService {
     {
         User user = userRepository.findByEmail(mail)
                 .orElseThrow( () ->
-                        new IllegalArgumentException("Nie ma konta z takim adresem e-mail: " + mail));
+                        new UserNotFoundException("Nie ma konta z takim adresem e-mail."));
         if(user.isEnabled()) {
-           throw new IllegalStateException("Konto jest już aktywne!");
+           throw new AccountAlreadyActivatedException("Konto jest już aktywne!");
         }
 
         ActivationToken existing = activationTokenRepository.findByUser(user).orElse(null);

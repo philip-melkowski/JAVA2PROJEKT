@@ -5,8 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
-import pl.melkowskiphilip.GoodReadsPL.dto.UserRegisterDTO;
-import pl.melkowskiphilip.GoodReadsPL.entity.Role;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
