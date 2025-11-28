@@ -7,6 +7,7 @@ import pl.melkowskiphilip.GoodReadsPL.dto.ReviewDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
 import pl.melkowskiphilip.GoodReadsPL.entity.Review;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.*;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
@@ -51,7 +52,7 @@ public class ReviewService {
     //  Jedna recenzja konkretnego użytkownika dla konkretnej książki
     public ReviewDTO findByBookAndUser(Long bookId, Long userId) {
         Optional<Review> rev = reviewRepository.findByBookIdAndUserId(bookId, userId);
-        return rev.map(this::toDTO).orElse(null);
+        return rev.map(this::toDTO).orElseThrow(() -> new ReviewNotFoundException("Recenzja nie istnieje."));
     }
 
 
@@ -61,14 +62,14 @@ public class ReviewService {
 
         // 1️⃣ Pobranie powiązanej książki i użytkownika
         Book book = bookRepository.findById(dto.getBookId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono książki o ID " + dto.getBookId()));
+                .orElseThrow(() -> new BookNotFoundException("Nie znaleziono książki o ID " + dto.getBookId()));
 
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o ID " + dto.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException("Nie znaleziono użytkownika o ID " + dto.getUserId()));
 
         // 2️⃣ Sprawdzenie, czy użytkownik już oceniał tę książkę
         if (reviewRepository.existsByBookIdAndUserId(dto.getBookId(), dto.getUserId())) {
-            throw new IllegalArgumentException("Użytkownik już dodał recenzję dla tej książki");
+            throw new ReviewAlreadyExistsException("Użytkownik już dodał recenzję dla tej książki");
         }
 
         // 3️⃣ Utworzenie nowej recenzji
@@ -99,10 +100,10 @@ public class ReviewService {
     @Transactional
     public ReviewDTO updateReview(ReviewDTO review) {
         if (review.getId() == null) {
-            throw new IllegalArgumentException("ID recenzji nie może być null przy aktualizacji");
+            throw new InvalidReviewIdException("ID recenzji nie może być null przy aktualizacji");
         }
         Review existingReview = reviewRepository.findById(review.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono recenzji o ID " + review.getId()));
+                .orElseThrow(() -> new ReviewNotFoundException("Nie znaleziono recenzji o ID " + review.getId()));
         existingReview.setRating(review.getRating());
         existingReview.setComment(review.getComment());
 
@@ -113,7 +114,7 @@ public class ReviewService {
     @Transactional
     public void deleteById(Long id) {
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono recenzji o ID " + id));
+                .orElseThrow(() -> new ReviewNotFoundException("Nie znaleziono recenzji o ID " + id));
 
         User user = review.getUser();
         Book book = review.getBook();
@@ -122,6 +123,9 @@ public class ReviewService {
         user.getReadBooks().remove(book);
         // usuniecie uzyktownika z przeczytanych
         book.getReaders().remove(user);
+
+        //usuniecie recenzji z listy recenzji nalezacej do ksiazki
+        book.getReviews().remove(review);
 
         // zapisanie po stronie owning side
         userRepository.save(user);
@@ -149,7 +153,6 @@ public class ReviewService {
 
     public ReviewDTO toDTO(Review review)
     {
-        if(review == null) return null;
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
         dto.setUsername(review.getUser().getUsername());

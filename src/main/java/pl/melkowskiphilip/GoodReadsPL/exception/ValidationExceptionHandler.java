@@ -118,4 +118,20 @@ public class ValidationExceptionHandler {
         return ResponseEntity.status(409).body(ex.getMessage());
     }
 
+    // nie znaleziono recenzji
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<String> handleReviewNotFound(ReviewNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ReviewAlreadyExistsException.class)
+    public ResponseEntity<String> handleReviewExists(ReviewAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidReviewIdException.class)
+    public ResponseEntity<String> handleInvalidReviewId(InvalidReviewIdException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
 }
