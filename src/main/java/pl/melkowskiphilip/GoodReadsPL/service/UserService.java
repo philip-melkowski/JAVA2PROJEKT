@@ -1,11 +1,16 @@
 package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.EmailAlreadyUsedException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.UserNotFoundException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.UsernameAlreadyUsedException;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
 import java.util.List;
@@ -32,7 +37,7 @@ public class UserService {
         return userRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new IllegalArgumentException("Uzytkownik o ID " + id + " nie istnieje"));
+                        new UserNotFoundException("Uzytkownik o ID " + id + " nie istnieje"));
     }
 
 
@@ -41,7 +46,7 @@ public class UserService {
         return userRepository.findByUsernameIgnoreCase(username)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new IllegalArgumentException("Uzytkownik o loginie " + username + " nie istnieje case insensitive"));
+                        new UserNotFoundException("Uzytkownik o loginie " + username + " nie istnieje case insensitive"));
     }
 
     // Pobranie użytkownika po e-mailu
@@ -49,7 +54,7 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new IllegalArgumentException("Uzytkownik o adresie e-mail " + email + " nie istnieje"));
+                        new UserNotFoundException("Uzytkownik o adresie e-mail " + email + " nie istnieje"));
     }
 
     // Sprawdzenie, czy e-mail istnieje w bazie
@@ -66,14 +71,20 @@ public class UserService {
     // Usunięcie użytkownika
     @Transactional
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
+        try {
+            userRepository.deleteById(id);
+        }
+        catch(EmptyResultDataAccessException e)
+        {
+            throw new UserNotFoundException("Nie znaleziono książki o ID " + id);
+        }
     }
 
     // aktualizacja użytkownika, np. po klikneiciu maila do aktywacji konta
     @Transactional
     public UserDTO updateUser(Long id, UserDTO updatedUser) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Użytkownik o ID " + id + " nie istnieje"));
+                .orElseThrow(() -> new UserNotFoundException("Użytkownik o ID " + id + " nie istnieje"));
 
 
         // Przykład: aktywacja konta po kliknięciu w link
@@ -84,7 +95,7 @@ public class UserService {
         // zmiana maila
         if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(existingUser.getEmail())) {
             if (existsByEmail(updatedUser.getEmail())) {
-                throw new IllegalStateException("Ten adres e-mail jest już zajęty!");
+                throw new EmailAlreadyUsedException("Ten adres e-mail jest już zajęty!");
             }
             existingUser.setEmail(updatedUser.getEmail());
         }
@@ -108,7 +119,6 @@ public class UserService {
     // User -> UserDTO
     public UserDTO toDTO(User user)
     {
-        if(user == null) return null;
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
