@@ -29,11 +29,8 @@ public class AuthorController {
     @GetMapping("/{id}")
     public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable Long id)
     {
-        AuthorDTO author = authorService.findById(id);
-        if (author == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(author);
+
+        return ResponseEntity.ok(authorService.findById(id));
     }
 
 
