@@ -1,10 +1,14 @@
 package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.AuthorDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Author;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.AuthorAlreadyExistsException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.AuthorNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 
 import java.util.List;
@@ -28,7 +32,7 @@ public class AuthorService {
     public AuthorDTO findById(Long id) {
         return authorRepository.findById(id)
                 .map(this::toDTO)
-                .orElse(null);
+                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + id));
     }
 
     // pobranie autorow po fragmencie w imieniu lub nazwisku
@@ -46,7 +50,7 @@ public class AuthorService {
         boolean exists = authorRepository.existsByNameAndSurname(dto.getName(), dto.getSurname());
         if(exists)
         {
-            throw new IllegalArgumentException("Autor juz istnieje w bazie");
+            throw new AuthorAlreadyExistsException("Autor juz istnieje w bazie");
         }
         Author author = new Author();
         author.setName(dto.getName());
@@ -58,7 +62,13 @@ public class AuthorService {
     // 🔹 Usunięcie autora
     @Transactional
     public void deleteById(Long id) {
-        authorRepository.deleteById(id);
+        try {
+            authorRepository.deleteById(id);
+        }
+        catch(EmptyResultDataAccessException e)
+        {
+            throw new AuthorNotFoundException("Nie znaleziono autora o ID " + id);
+        }
     }
 
 
@@ -67,7 +77,7 @@ public class AuthorService {
     public AuthorDTO updateAuthor(Long id, AuthorDTO updatedAuthor)
     {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono autora o ID " + id));
+                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + id));
         author.setName(updatedAuthor.getName());
         author.setSurname(updatedAuthor.getSurname());
         return toDTO(authorRepository.save(author));

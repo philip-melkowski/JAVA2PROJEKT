@@ -113,4 +113,9 @@ public class ValidationExceptionHandler {
         return ResponseEntity.status(404).body(ex.getMessage());
     }
 
+    @ExceptionHandler(AuthorAlreadyExistsException.class)
+    public ResponseEntity<String> handleAuthorExists(AuthorAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
 }
