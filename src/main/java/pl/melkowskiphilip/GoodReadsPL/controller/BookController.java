@@ -27,11 +27,7 @@ public class BookController {
     // zwraca ksiazke po id
     @GetMapping("/{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
-        BookDTO book = bookService.findById(id);
-        if (book == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(book);
+        return ResponseEntity.ok(bookService.findById(id));
     }
 
     // dodaje ksiazki, jesli nie istnieje jeszce

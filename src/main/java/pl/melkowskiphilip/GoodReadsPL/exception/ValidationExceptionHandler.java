@@ -95,4 +95,22 @@ public class ValidationExceptionHandler {
         return ResponseEntity.status(500).body(ex.getMessage());
     }
 
+    // nie znaleziono książki
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<String> handleBookNotFound(BookNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    // książka już istnieje - przy dodawaniu
+    @ExceptionHandler(BookAlreadyExistsException.class)
+    public ResponseEntity<String> handleBookExists(BookAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
+    // nie znaleziono autora
+    @ExceptionHandler(AuthorNotFoundException.class)
+    public ResponseEntity<String> handleAuthorNotFound(AuthorNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
 }
