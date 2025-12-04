@@ -111,9 +111,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             // puszcza dalej zadanie, jesli nie puscimy to tu utknie
             filterChain.doFilter(request, response);
         }
-        catch(Exception e)
-        {
-            // lapanie bledu przez handler i zwracanie go jako odpowiedzi HTTP
+        catch (io.jsonwebtoken.JwtException e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
 
