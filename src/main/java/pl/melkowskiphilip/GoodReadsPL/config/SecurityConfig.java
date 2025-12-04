@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) ->
                         handlerExceptionResolver.resolveException(req, res, null, e)
                 ))
-                .formLogin(AbstractHttpConfigurer::disable) // wylaczone bo domyslnie podmienia zadanie post na /login na formularz htttp - w frotnedzie REST z react wylaczamy
+                .formLogin(AbstractHttpConfigurer::disable) // wylaczone bo domyslnie podmienia zadanie post na /login na formularz htttp - jeśli RESTOWA apka z Reactem to wyłączamy to
                 .httpBasic(AbstractHttpConfigurer::disable); // przezytek do autoryzacji basic username:password
 
 
