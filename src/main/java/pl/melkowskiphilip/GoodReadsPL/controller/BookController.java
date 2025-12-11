@@ -1,6 +1,7 @@
 package pl.melkowskiphilip.GoodReadsPL.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
@@ -31,6 +32,15 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.findById(id));
+    }
+
+    // endpoint na daną stronę
+    @GetMapping("/page")
+    public ResponseEntity<Page<BookDTO>> getBooksPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(bookService.getPage(page, size));
     }
 
     // dodaje ksiazki, jesli nie istnieje jeszce

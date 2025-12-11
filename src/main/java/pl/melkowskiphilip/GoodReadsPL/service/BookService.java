@@ -2,6 +2,8 @@ package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,12 @@ public class BookService {
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    // zwraca daną stronę - przydaje się na front endzie, gdzie user będzie mógł przewijać między stronami
+    public Page<BookDTO> getPage(int page, int size) {
+        return bookRepository.findAll(PageRequest.of(page, size))
+                .map(this::toDTO);
     }
 
     //  Pobranie książki po ID
