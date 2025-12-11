@@ -6,8 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import pl.melkowskiphilip.GoodReadsPL.validation.NotBlankTrimmed;
+
 import java.time.Year;
 
 @Data // Z Lomboka – generuje automatycznie: gettery, settery, equals(),
@@ -20,7 +21,7 @@ public class BookDTO {
     private Long id;
 
     @Size(max = 200, message = "Tytuł może mieć max 200 znaków długości")
-    @NotBlank(message = "Książka musi mieć tytuł")
+    @NotBlankTrimmed(message = "Książka musi mieć tytuł")
     private String title;
 
     // genre moze byc puste
