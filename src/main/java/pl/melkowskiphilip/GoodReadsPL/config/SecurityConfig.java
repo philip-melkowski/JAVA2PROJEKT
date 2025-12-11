@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable); // przezytek do autoryzacji basic username:password
 
 
-        // wpiecie filtra tokenem JWT przed UsernamePasswdAuthFilter bo wybierany jest na zasadzie kto pierwszy
+        // wpiecie filtra tokenem JWT przed AuthFilter bo wybierany jest na zasadzie kto pierwszy
         http.addFilterBefore(jwtAuthFilter, AuthorizationFilter.class);
 
 
