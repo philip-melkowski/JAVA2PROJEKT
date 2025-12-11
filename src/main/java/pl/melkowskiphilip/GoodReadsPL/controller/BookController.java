@@ -20,8 +20,11 @@ public class BookController {
 
     // zwraca wszystkie ksiazki
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
-        return ResponseEntity.ok(bookService.findAll());
+    public ResponseEntity<List<BookDTO>> getAllBooks(
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String order) {
+
+        return ResponseEntity.ok(bookService.getAllBooksSorted(sortBy, order));
     }
 
     // zwraca ksiazke po id

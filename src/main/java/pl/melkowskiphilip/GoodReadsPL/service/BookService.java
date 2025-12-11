@@ -2,6 +2,7 @@ package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
@@ -26,6 +27,19 @@ public class BookService {
     //  Pobranie wszystkich książek
     public List<BookDTO> findAll() {
         return bookRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // zwraca książki posortwnae
+    public List<BookDTO> getAllBooksSorted(String sortBy, String order) {
+
+        Sort sort = order.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        return bookRepository.findAll(sort)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
