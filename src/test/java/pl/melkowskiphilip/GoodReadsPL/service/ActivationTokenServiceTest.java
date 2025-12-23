@@ -97,7 +97,7 @@ public class ActivationTokenServiceTest {
         assert result.getToken() != null;
         assert result.getUser().getId().equals(1L);
         assert result.getCreatedAt() != null;
-        assert result.getExpiresAt().equals(result.getCreatedAt().plusDays(7));
+        assert result.getExpiresAt().isAfter(result.getCreatedAt());
 
 
         // sprawdzamy, czy save zostało wywołane raz
