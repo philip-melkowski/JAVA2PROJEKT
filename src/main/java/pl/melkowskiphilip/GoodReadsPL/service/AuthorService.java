@@ -21,14 +21,14 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    // 🔹 Pobranie wszystkich autorów
+    //  Pobranie wszystkich autorów
     public List<AuthorDTO> findAll() {
         return authorRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // 🔹 Pobranie autora po ID
+    //  Pobranie autora po ID
     public AuthorDTO findById(Long id) {
         return authorRepository.findById(id)
                 .map(this::toDTO)
@@ -59,7 +59,7 @@ public class AuthorService {
         return toDTO(saved);
     }
 
-    // 🔹 Usunięcie autora
+    //  Usunięcie autora
     @Transactional
     public void deleteById(Long id) {
         try {
