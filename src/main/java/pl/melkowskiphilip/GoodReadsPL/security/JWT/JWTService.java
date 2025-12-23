@@ -82,8 +82,14 @@ public class JWTService {
     // czy token jest prawidlowy - czy username == subject z tokenu
     public boolean isTokenValid(String token, UserDetails userDetails)
     {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        }
+        catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // token wygasł → normalny stan, NIE wyjątek
+            return false;
+        }
     }
 
     // czy token przedawniony.
