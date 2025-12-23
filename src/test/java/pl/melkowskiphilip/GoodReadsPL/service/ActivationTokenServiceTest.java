@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.melkowskiphilip.GoodReadsPL.entity.ActivationToken;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.ActivationTokenExpiredException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.InvalidActivationTokenException;
 import pl.melkowskiphilip.GoodReadsPL.repository.ActivationTokenRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
@@ -164,6 +165,31 @@ public class ActivationTokenServiceTest {
     @Test
     void tokenExpired()
     {
+
+        // arrange
+
+        User user = new User();
+        user.setId(1L);
+        user.setEnabled(false);
+
+        String token = "EXPIRED_TOKEN";
+        ActivationToken activationToken = new ActivationToken();
+        activationToken.setExpiresAt(LocalDateTime.now().minusDays(1));
+        activationToken.setToken(token);
+        activationToken.setUser(user);
+
+        when(activationTokenRepository.findByToken(token)).thenReturn(Optional.of(activationToken));
+
+        // act + assert
+
+        assertThrows(ActivationTokenExpiredException.class, () -> activationTokenService.activateAccount(token));
+
+
+        // assert
+
+        assert !user.isEnabled();
+        verify(userRepository, never()).save(any(User.class));
+        verify(activationTokenRepository, never()).delete(any(ActivationToken.class));
 
     }
 
