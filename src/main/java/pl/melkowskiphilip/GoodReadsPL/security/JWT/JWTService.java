@@ -20,11 +20,11 @@ import java.util.function.Function;
 public class JWTService {
 
     @Value("${jwt.secret}")
-    private String secretKey;
+    protected String secretKey;
 
     @Value("${jwt.expiration}")
     @Getter
-    private Long expirationJWT;
+    protected Long expirationJWT;
 
 
     // wydobywa username z token - poniewaz username w naszym tokenie jest subjectem - czyli forma ID
@@ -89,8 +89,14 @@ public class JWTService {
     // czy token przedawniony.
     public boolean isTokenExpired(String token)
     {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        }
+        catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return true;
+        }
     }
+
 
     // wyciagnij z mapy wszystkich claimow expiration
     public Date extractExpiration(String token)
