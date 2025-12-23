@@ -2,15 +2,12 @@ package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.UserDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
-import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.EmailAlreadyUsedException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.UserNotFoundException;
-import pl.melkowskiphilip.GoodReadsPL.exception.custom.UsernameAlreadyUsedException;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 
 import java.util.List;
@@ -22,7 +19,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     // Pobranie wszystkich użytkowników
     public List<UserDTO> findAll() {
