@@ -18,6 +18,6 @@ public class ActivationTokenController {
     @GetMapping
     public ResponseEntity<String> activateAccount(@RequestParam String token) {
         activationTokenService.activateAccount(token);
-        return ResponseEntity.ok("Konto zostało pomyślnie aktywowane!");
+        return ResponseEntity.ok("success.account.activated");
     }
 }
