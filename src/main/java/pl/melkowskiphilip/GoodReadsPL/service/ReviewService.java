@@ -52,7 +52,7 @@ public class ReviewService {
     //  Jedna recenzja konkretnego użytkownika dla konkretnej książki
     public ReviewDTO findByBookAndUser(Long bookId, Long userId) {
         Optional<Review> rev = reviewRepository.findByBookIdAndUserId(bookId, userId);
-        return rev.map(this::toDTO).orElseThrow(() -> new ReviewNotFoundException("Recenzja nie istnieje."));
+        return rev.map(this::toDTO).orElseThrow(() -> new ReviewNotFoundException("error.review.notfound"));
     }
 
 
@@ -62,14 +62,14 @@ public class ReviewService {
 
         // 1️⃣ Pobranie powiązanej książki i użytkownika
         Book book = bookRepository.findById(dto.getBookId())
-                .orElseThrow(() -> new BookNotFoundException("Nie znaleziono książki o ID " + dto.getBookId()));
+                .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
 
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("Nie znaleziono użytkownika o ID " + dto.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException("error.book.notfound"));
 
         // 2️⃣ Sprawdzenie, czy użytkownik już oceniał tę książkę
         if (reviewRepository.existsByBookIdAndUserId(dto.getBookId(), dto.getUserId())) {
-            throw new ReviewAlreadyExistsException("Użytkownik już dodał recenzję dla tej książki");
+            throw new ReviewAlreadyExistsException("error.review.alreadyexists");
         }
 
         // 3️⃣ Utworzenie nowej recenzji
@@ -100,10 +100,10 @@ public class ReviewService {
     @Transactional
     public ReviewDTO updateReview(ReviewDTO review) {
         if (review.getId() == null) {
-            throw new InvalidReviewIdException("ID recenzji nie może być null przy aktualizacji");
+            throw new InvalidReviewIdException("error.review.invalid.id");
         }
         Review existingReview = reviewRepository.findById(review.getId())
-                .orElseThrow(() -> new ReviewNotFoundException("Nie znaleziono recenzji o ID " + review.getId()));
+                .orElseThrow(() -> new ReviewNotFoundException("error.review.notfound"));
         existingReview.setRating(review.getRating());
         existingReview.setComment(review.getComment());
 
@@ -114,7 +114,7 @@ public class ReviewService {
     @Transactional
     public void deleteById(Long id) {
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new ReviewNotFoundException("Nie znaleziono recenzji o ID " + id));
+                .orElseThrow(() -> new ReviewNotFoundException("error.review.notfound"));
 
         User user = review.getUser();
         Book book = review.getBook();
