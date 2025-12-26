@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.Predicate;
 
 
 // cb.conjunction() - to jest odpowiednik true w SQL
+// TUTAJ TYLKO METODY FILTRUJĄCE - SORTOWANIE BĘDZIE WYŻEJ
 public class BookSpecification {
 
     // filtr po gatunku książki
