@@ -1,0 +1,146 @@
+package pl.melkowskiphilip.GoodReadsPL.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.melkowskiphilip.GoodReadsPL.entity.Book;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.AuthorNotFoundException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookAlreadyExistsException;
+import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
+import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
+import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
+
+import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true) // tutaj metody tylko do odczytu, chyba ze maja wlasną adnotacje @transactional. poprawia wydajność
+public class BookService {
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository; // do pobrania autora po authorId i przypisania go do ksiazki;
+
+    //  Pobranie wszystkich książek
+    public List<BookDTO> findAll() {
+        return bookRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // zwraca książki posortwnae
+    public List<BookDTO> getAllBooksSorted(String sortBy, String order) {
+
+        Sort sort = order.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        return bookRepository.findAll(sort)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // zwraca daną stronę - przydaje się na front endzie, gdzie user będzie mógł przewijać między stronami
+    public Page<BookDTO> getPage(int page, int size) {
+        return bookRepository.findAll(PageRequest.of(page, size))
+                .map(this::toDTO);
+    }
+
+    //  Pobranie książki po ID
+    public BookDTO findById(Long id) {
+        return bookRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new BookNotFoundException("error.author.notfound"));
+    }
+
+    //  Zapis nowej książki
+    @Transactional // odczyt i zapis zmian
+    public BookDTO saveFromDTO(BookDTO dto) {
+        var author = authorRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new AuthorNotFoundException("error.book.notfound"));
+
+        boolean exists = bookRepository.existsByTitleAndAuthorId(dto.getTitle(), dto.getAuthorId());
+        if(exists)
+        {
+            throw new BookAlreadyExistsException("error.book.exists");
+        }
+        Book book = new Book();
+        book.setTitle(dto.getTitle());
+        book.setGenre(dto.getGenre());
+        book.setPublishYear(dto.getPublishYear());
+        book.setAuthor(author);
+
+
+        return toDTO(bookRepository.save(book));
+    }
+
+    //  Usunięcie książki po ID
+    @Transactional // odczyt i zapis zmian
+    public void deleteById(Long id) {
+        try {
+            bookRepository.deleteById(id);
+        }
+        catch(EmptyResultDataAccessException e)
+        {
+            throw new BookNotFoundException("error.book.notfound");
+        }
+    }
+
+    // 🔹 Sortowanie malejąco po średniej (najlepsze książki)
+    public List<BookDTO> sortBooksByAverageRatingDesc(List<BookDTO> books) {
+        return books.stream()
+                .sorted((b1, b2) -> Double.compare(
+                        b2.getAverageRating() != null ? b2.getAverageRating() : 0.0,
+                        b1.getAverageRating() != null ? b1.getAverageRating() : 0.0))
+                .collect(Collectors.toList());
+    }
+
+    // 🔹 Sortowanie rosnąco po średniej (najgorsze książki)
+    public List<BookDTO> sortBooksByAverageRatingAsc(List<BookDTO> books) {
+        return books.stream()
+                .sorted((b1, b2) -> Double.compare(
+                        b1.getAverageRating() != null ? b1.getAverageRating() : 0.0,
+                        b2.getAverageRating() != null ? b2.getAverageRating() : 0.0))
+                .collect(Collectors.toList());
+    }
+
+
+    // aktualizacja ksiazki
+    @Transactional // do odczytu i zapisu
+    public BookDTO updateBook(Long id, BookDTO updatedBook)
+    {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
+        book.setTitle(updatedBook.getTitle());
+        book.setGenre(updatedBook.getGenre());
+        book.setPublishYear(updatedBook.getPublishYear());
+
+        var author = authorRepository.findById(updatedBook.getAuthorId())
+                .orElseThrow(() -> new AuthorNotFoundException("error.author.notfound"));
+        book.setAuthor(author);
+
+        return toDTO(bookRepository.save(book));
+    }
+
+    //  Mapowanie Book -> BookDTO
+    private BookDTO toDTO(Book book) {
+        BookDTO dto = new BookDTO();
+        dto.setId(book.getId());
+        dto.setTitle(book.getTitle());
+        dto.setGenre(book.getGenre());
+        dto.setPublishYear(book.getPublishYear());
+        dto.setAuthorName(book.getAuthor().getName());
+        dto.setAuthorSurname(book.getAuthor().getSurname());
+        dto.setAuthorId(book.getAuthor().getId());
+        dto.setAverageRating(bookRepository.findAverageRatingForBook(book.getId()));
+        return dto;
+    }
+
+}

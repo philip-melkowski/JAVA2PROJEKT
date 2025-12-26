@@ -1,0 +1,8 @@
+pl/melkowskiphilip/GoodReadsPL/service/UserServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/service/ActivationTokenServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/service/ReviewServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/auth/AuthServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/service/BookServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/GoodReadsPlApplicationTests.class
+pl/melkowskiphilip/GoodReadsPL/security/JWT/JWTServiceTest.class
+pl/melkowskiphilip/GoodReadsPL/service/AuthorServiceTest.class
