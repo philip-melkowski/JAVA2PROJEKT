@@ -1,33 +1,67 @@
-    HELP.md
-    target/
-    .mvn/wrapper/maven-wrapper.jar
-    !**/src/main/**/target/
-    !**/src/test/**/target/
+# =========================
+# Backend – Spring Boot / Maven
+# =========================
+backend/target/
+target/
+*.log
 
-    ### STS ###
-    .apt_generated
-    .classpath
-    .factorypath
-    .project
-    .settings
-    .springBeans
-    .sts4-cache
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
 
-    ### IntelliJ IDEA ###
-    .idea
-    *.iws
-    *.iml
-    *.ipr
-    src/main/resources/application.properties
-    ### NetBeans ###
-    /nbproject/private/
-    /nbbuild/
-    /dist/
-    /nbdist/
-    /.nb-gradle/
-    build/
-    !**/src/main/**/build/
-    !**/src/test/**/build/
+# NIE ignoruj targetów w src (testy generujące pliki)
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-    ### VS Code ###
-    .vscode/
+# =========================
+# Frontend – React / Vite
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.local
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# =========================
+# Eclipse / STS
+# =========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# =========================
+# NetBeans
+# =========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# =========================
+# Build tools
+# =========================
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# OS
+# =========================
+.DS_Store
