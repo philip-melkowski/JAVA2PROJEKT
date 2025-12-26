@@ -1,6 +1,7 @@
 package pl.melkowskiphilip.GoodReadsPL.exception;
 
-
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -10,128 +11,198 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.*;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-@RestControllerAdvice // - obsluguje wszystkie kontrolery, @Rest mowi ze zwracamy Response Body JSON
+@RestControllerAdvice
 public class ValidationExceptionHandler {
 
+    private final MessageSource messageSource;
+
+    public ValidationExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    // ========= AUTH / USER =========
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage()); // 404 Not Found
+    public ResponseEntity<String> handleUserNotFoundException(
+            UserNotFoundException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(404)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<String> handleInvalidCredentials(InvalidCredentialsException ex) {
-        return ResponseEntity.status(401).body(ex.getMessage()); // 401 Unauthorized
+    public ResponseEntity<String> handleInvalidCredentials(
+            InvalidCredentialsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(401)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(AccountNotActivatedException.class)
-    public ResponseEntity<String> handleAccountNotActivated(AccountNotActivatedException ex) {
-        return ResponseEntity.status(403).body(ex.getMessage()); // 403 Forbidden
+    public ResponseEntity<String> handleAccountNotActivated(
+            AccountNotActivatedException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(403)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(EmailAlreadyUsedException.class)
-    public ResponseEntity<String> handleEmailUsed(EmailAlreadyUsedException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
+    public ResponseEntity<String> handleEmailUsed(
+            EmailAlreadyUsedException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(UsernameAlreadyUsedException.class)
-    public ResponseEntity<String> handleUsernameUsed(UsernameAlreadyUsedException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
+    public ResponseEntity<String> handleUsernameUsed(
+            UsernameAlreadyUsedException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(AccountAlreadyActivatedException.class)
-    public ResponseEntity<String> handleAccountAlreadyActive(AccountAlreadyActivatedException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
+    public ResponseEntity<String> handleAccountAlreadyActive(
+            AccountAlreadyActivatedException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
+    // ========= TOKEN =========
+
     @ExceptionHandler(InvalidActivationTokenException.class)
-    public ResponseEntity<String> handleInvalidActivationToken(InvalidActivationTokenException ex) {
-        return ResponseEntity.status(400).body(ex.getMessage()); // 400 Bad Request
+    public ResponseEntity<String> handleInvalidActivationToken(
+            InvalidActivationTokenException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(400)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(ActivationTokenExpiredException.class)
-    public ResponseEntity<String> handleActivationTokenExpired(ActivationTokenExpiredException ex) {
-        return ResponseEntity.status(410).body(ex.getMessage()); // 410 Gone — token wygasł
+    public ResponseEntity<String> handleActivationTokenExpired(
+            ActivationTokenExpiredException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(410)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
+    // ========= VALIDATION =========
 
-    // jesli gdzies wystapi blad MethArgNValExc - to zrob to w przypadku adnotacji @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors); // zwroci jsona
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage()));
 
+        return ResponseEntity.badRequest().body(errors);
     }
 
-    // wywolywane np. dla dodania autora ktory juz jest w bazie
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity
-                .badRequest()
-                .body(ex.getMessage());
-    }
+    // ========= SECURITY =========
 
-    // dla nieaktywnego konta.
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<String> handleDisabled(DisabledException ex)
-    {
-        return ResponseEntity.status(403).body(ex.getMessage());
+    public ResponseEntity<String> handleDisabled(
+            DisabledException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(403)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
-    // złe dane logowania
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex)
-    {
-        return ResponseEntity.status(401).body(ex.getMessage());
+    public ResponseEntity<String> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(401)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
-    // np. przy niepowodzeniu przy wyslaniu maila
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalState(IllegalStateException ex)
-    {
-        return ResponseEntity.status(500).body(ex.getMessage());
-    }
+    // ========= BOOK / AUTHOR / REVIEW =========
 
-    // nie znaleziono książki
     @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<String> handleBookNotFound(BookNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    public ResponseEntity<String> handleBookNotFound(
+            BookNotFoundException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(404)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
-    // książka już istnieje - przy dodawaniu
     @ExceptionHandler(BookAlreadyExistsException.class)
-    public ResponseEntity<String> handleBookExists(BookAlreadyExistsException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
+    public ResponseEntity<String> handleBookExists(
+            BookAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
-    // nie znaleziono autora
     @ExceptionHandler(AuthorNotFoundException.class)
-    public ResponseEntity<String> handleAuthorNotFound(AuthorNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    public ResponseEntity<String> handleAuthorNotFound(
+            AuthorNotFoundException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(404)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(AuthorAlreadyExistsException.class)
-    public ResponseEntity<String> handleAuthorExists(AuthorAlreadyExistsException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
+    public ResponseEntity<String> handleAuthorExists(
+            AuthorAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
-    // nie znaleziono recenzji
     @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<String> handleReviewNotFound(ReviewNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    public ResponseEntity<String> handleReviewNotFound(
+            ReviewNotFoundException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(404)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(ReviewAlreadyExistsException.class)
-    public ResponseEntity<String> handleReviewExists(ReviewAlreadyExistsException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
+    public ResponseEntity<String> handleReviewExists(
+            ReviewAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(409)
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
     @ExceptionHandler(InvalidReviewIdException.class)
-    public ResponseEntity<String> handleInvalidReviewId(InvalidReviewIdException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> handleInvalidReviewId(
+            InvalidReviewIdException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.badRequest()
+                .body(resolveMessage(ex.getMessage(), request));
     }
 
+    // ========= HELPER =========
+
+    private String resolveMessage(String key, HttpServletRequest request) {
+        Locale locale = request.getLocale();
+        return messageSource.getMessage(key, null, key, locale);
+    }
 }
