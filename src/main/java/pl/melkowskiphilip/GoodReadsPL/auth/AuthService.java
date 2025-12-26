@@ -33,10 +33,10 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user =
                 userRepository.findByEmail(loginRequestDTO.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("Użytkownik o podanym emailu nie istnieje"));
+                .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
 
         if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Niepoprawne dane logowania"); // tutaj dodac w drugim jezyku
+            throw new InvalidCredentialsException("error.auth.invalid.credentials"); // tutaj dodac w drugim jezyku
         }
         // jesli nie zostalo aktywowane konto
         if(!user.isEnabled()) {
@@ -56,7 +56,7 @@ public class AuthService {
             }
             emailService.sendActivationEmail(user, token.getToken());
 
-            throw new AccountNotActivatedException("Konto nieaktywne - wysłaliśmy mail z linkiem aktywacji");
+            throw new AccountNotActivatedException("error.auth.not.activated");
 
 
         }
@@ -71,10 +71,10 @@ public class AuthService {
 
     public UserDTO register(UserRegisterDTO user) {
         if(userRepository.existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyUsedException("Istnieje już konto z podanym adresem e-mail");
+            throw new EmailAlreadyUsedException("error.user.email.used");
         }
         if(userRepository.existsByUsername(user.getUsername())) {
-            throw new UsernameAlreadyUsedException("Istnieje już konto z podaną nazwą użytkownika");
+            throw new UsernameAlreadyUsedException("error.user.exist");
         }
 
         User newUser = new User();
@@ -96,9 +96,9 @@ public class AuthService {
     {
         User user = userRepository.findByEmail(mail)
                 .orElseThrow( () ->
-                        new UserNotFoundException("Nie ma konta z takim adresem e-mail."));
+                        new UserNotFoundException("error.user.notfound"));
         if(user.isEnabled()) {
-           throw new AccountAlreadyActivatedException("Konto jest już aktywne!");
+           throw new AccountAlreadyActivatedException("error.account.alreadyactivated");
         }
 
         ActivationToken existing = activationTokenRepository.findByUser(user).orElse(null);
