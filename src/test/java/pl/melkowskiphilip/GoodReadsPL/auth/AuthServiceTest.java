@@ -67,7 +67,9 @@ class AuthServiceTest {
         user.setEnabled(true);
         user.setRole(Role.USER);
 
-        LoginRequestDTO request = new LoginRequestDTO("test@test.com", "password");
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setEmail("test@test.com");
+        request.setPassword("password");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("password", "hashed")).thenReturn(true);
@@ -84,7 +86,9 @@ class AuthServiceTest {
 
     @Test
     void shouldThrowWhenUserNotFoundOnLogin() {
-        LoginRequestDTO request = new LoginRequestDTO("x@test.com", "pass");
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setEmail("x@test.com");
+        request.setPassword("pass");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
 
@@ -99,7 +103,9 @@ class AuthServiceTest {
         user.setPassword("hashed");
         user.setEnabled(true);
 
-        LoginRequestDTO request = new LoginRequestDTO("test@test.com", "wrong");
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setEmail("test@test.com");
+        request.setPassword("wrong");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
@@ -117,7 +123,9 @@ class AuthServiceTest {
         ActivationToken token = new ActivationToken();
         token.setToken("ACTIVATION_TOKEN");
 
-        LoginRequestDTO request = new LoginRequestDTO("test@test.com", "password");
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setEmail("test@test.com");
+        request.setPassword("password");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(any(), any())).thenReturn(true);
@@ -146,6 +154,8 @@ class AuthServiceTest {
         when(userRepository.existsByUsername(dto.getUsername())).thenReturn(false);
         when(passwordEncoder.encode(dto.getPassword())).thenReturn("hashed");
         when(activationTokenService.createTokenForUser(any())).thenReturn(new ActivationToken());
+        when(userService.toDTO(any(User.class)))
+                .thenReturn(new pl.melkowskiphilip.GoodReadsPL.dto.UserDTO());
 
         authService.register(dto);
 
