@@ -57,19 +57,19 @@ public class BookService {
     public BookDTO findById(Long id) {
         return bookRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new BookNotFoundException("Nie znaleziono książki o ID " + id));
+                .orElseThrow(() -> new BookNotFoundException("error.author.notfound"));
     }
 
     //  Zapis nowej książki
     @Transactional // odczyt i zapis zmian
     public BookDTO saveFromDTO(BookDTO dto) {
         var author = authorRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + dto.getAuthorId()));
+                .orElseThrow(() -> new AuthorNotFoundException("error.book.notfound"));
 
         boolean exists = bookRepository.existsByTitleAndAuthorId(dto.getTitle(), dto.getAuthorId());
         if(exists)
         {
-            throw new BookAlreadyExistsException("Ksiazka juz istnieje w bazie");
+            throw new BookAlreadyExistsException("error.book.exists");
         }
         Book book = new Book();
         book.setTitle(dto.getTitle());
@@ -89,7 +89,7 @@ public class BookService {
         }
         catch(EmptyResultDataAccessException e)
         {
-            throw new BookNotFoundException("Nie znaleziono książki o ID " + id);
+            throw new BookNotFoundException("error.book.notfound");
         }
     }
 
@@ -117,13 +117,13 @@ public class BookService {
     public BookDTO updateBook(Long id, BookDTO updatedBook)
     {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Nie znaleziono ksiazki o ID " + id));
+                .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
         book.setTitle(updatedBook.getTitle());
         book.setGenre(updatedBook.getGenre());
         book.setPublishYear(updatedBook.getPublishYear());
 
         var author = authorRepository.findById(updatedBook.getAuthorId())
-                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + updatedBook.getAuthorId()));
+                .orElseThrow(() -> new AuthorNotFoundException("error.author.notfound"));
         book.setAuthor(author);
 
         return toDTO(bookRepository.save(book));
