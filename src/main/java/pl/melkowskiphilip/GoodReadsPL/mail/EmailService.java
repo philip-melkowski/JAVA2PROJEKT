@@ -38,7 +38,7 @@ public class EmailService {
             mailSender.send(message);
 
         } catch (MessagingException e) {
-            throw new IllegalStateException("Nie udało się wysłać emaila: " + e.getMessage());
+            throw new IllegalStateException("error.email.couldntsend");
         }
     }
 
