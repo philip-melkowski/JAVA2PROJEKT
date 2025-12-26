@@ -33,7 +33,7 @@ public class UserService {
         return userRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new UserNotFoundException("Uzytkownik o ID " + id + " nie istnieje"));
+                        new UserNotFoundException("error.user.notfound"));
     }
 
 
@@ -42,7 +42,7 @@ public class UserService {
         return userRepository.findByUsernameIgnoreCase(username)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new UserNotFoundException("Uzytkownik o loginie " + username + " nie istnieje case insensitive"));
+                        new UserNotFoundException("error.user.notfound"));
     }
 
     // Pobranie użytkownika po e-mailu
@@ -50,7 +50,7 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .map(this::toDTO)
                 .orElseThrow( () ->
-                        new UserNotFoundException("Uzytkownik o adresie e-mail " + email + " nie istnieje"));
+                        new UserNotFoundException("error.user.notfound"));
     }
 
     // Sprawdzenie, czy e-mail istnieje w bazie
@@ -72,7 +72,7 @@ public class UserService {
         }
         catch(EmptyResultDataAccessException e)
         {
-            throw new UserNotFoundException("Nie znaleziono książki o ID " + id);
+            throw new UserNotFoundException("error.user.notfound");
         }
     }
 
@@ -80,7 +80,7 @@ public class UserService {
     @Transactional
     public UserDTO updateUser(Long id, UserDTO updatedUser) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Użytkownik o ID " + id + " nie istnieje"));
+                .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
 
 
         // Przykład: aktywacja konta po kliknięciu w link
@@ -91,7 +91,7 @@ public class UserService {
         // zmiana maila
         if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(existingUser.getEmail())) {
             if (existsByEmail(updatedUser.getEmail())) {
-                throw new EmailAlreadyUsedException("Ten adres e-mail jest już zajęty!");
+                throw new EmailAlreadyUsedException("validation.email.alreadyexists");
             }
             existingUser.setEmail(updatedUser.getEmail());
         }
