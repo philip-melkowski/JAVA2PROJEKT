@@ -31,7 +31,7 @@ public class AuthorService {
     public AuthorDTO findById(Long id) {
         return authorRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + id));
+                .orElseThrow(() -> new AuthorNotFoundException("error.author.notfound"));
     }
 
     // pobranie autorow po fragmencie w imieniu lub nazwisku
@@ -49,7 +49,7 @@ public class AuthorService {
         boolean exists = authorRepository.existsByNameAndSurname(dto.getName(), dto.getSurname());
         if(exists)
         {
-            throw new AuthorAlreadyExistsException("Autor juz istnieje w bazie");
+            throw new AuthorAlreadyExistsException("error.author.exists");
         }
         Author author = new Author();
         author.setName(dto.getName());
@@ -66,7 +66,7 @@ public class AuthorService {
         }
         catch(EmptyResultDataAccessException e)
         {
-            throw new AuthorNotFoundException("Nie znaleziono autora o ID " + id);
+            throw new AuthorNotFoundException("error.author.notfound");
         }
     }
 
@@ -76,7 +76,7 @@ public class AuthorService {
     public AuthorDTO updateAuthor(Long id, AuthorDTO updatedAuthor)
     {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new AuthorNotFoundException("Nie znaleziono autora o ID " + id));
+                .orElseThrow(() -> new AuthorNotFoundException("error.author.notfound"));
         author.setName(updatedAuthor.getName());
         author.setSurname(updatedAuthor.getSurname());
         return toDTO(authorRepository.save(author));
