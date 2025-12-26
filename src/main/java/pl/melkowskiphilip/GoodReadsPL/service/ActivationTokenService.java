@@ -45,11 +45,11 @@ public class ActivationTokenService {
     public void activateAccount(String token)
     {
         ActivationToken optionalToken = activationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidActivationTokenException("Niepoprawny token aktywacji."));
+                .orElseThrow(() -> new InvalidActivationTokenException("error.invalidActivationToken"));
 
         if(!isTokenValid(optionalToken))
         {
-            throw new ActivationTokenExpiredException("Token wygasł!");
+            throw new ActivationTokenExpiredException("error.activationTokenExpired");
         }
 
         User user = optionalToken.getUser();
