@@ -1,8 +1,11 @@
 import {useState} from "react";
 import {Box, Button, TextField, Typography, Paper} from "@mui/material";
-import {login} from "../auth/authApi";
+import {useAuth} from "../auth/AuthContext";
 
 export default function LoginPage() {
+
+    // wolanie hooka z AuthContext
+    const { login, isAuthenticated } = useAuth();
 
     // stan formularza
     const [email, setEmail] = useState("");
@@ -36,14 +39,20 @@ export default function LoginPage() {
 
         try
         {
-            const result = await login(email, password);
-            console.log("zalogowano, token: ", result.token);
+            await login(email, password);
+
+
         }
         catch(err: any)
         {
             setPasswordError(err.message);
         }
     };
+
+    if(isAuthenticated)
+    {
+        return <div>You are logged in!</div>
+    }
 
     return (
     <Box

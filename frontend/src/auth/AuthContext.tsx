@@ -18,13 +18,13 @@ export const AuthProvider = (props: {children: ReactNode}) =>{
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
 
 
-    const handleLogin = async (email: string, password: string) => {
+    const loginUser = async (email: string, password: string) => {
         const result = await login(email, password);
         setToken(result.token);
         localStorage.setItem("token", result.token);
     }
 
-    const handleLogout = () => {
+    const logoutUser = () => {
         setToken(null);
         localStorage.removeItem("token");
     }
@@ -33,13 +33,14 @@ export const AuthProvider = (props: {children: ReactNode}) =>{
         <AuthContext.Provider value={{
             token,
             isAuthenticated: !!token, // !! oznacza - boolowska wersja wartości - czy token istnieje.
-            login: handleLogin,
-            logout: handleLogout}}>
+            login: loginUser,
+            logout: logoutUser}}>
             {children}
         </AuthContext.Provider>
     )
 }
 
+// custom hook
 //  żeby zamiast pisac useContext(AuthContext) moć napisac const {login, token} = useAuth();
 export const useAuth = () =>
 {
