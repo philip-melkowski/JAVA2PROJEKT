@@ -1,5 +1,5 @@
 import {createContext, useContext, useState, type ReactNode} from 'react';
-import {login} from "./authApi.ts"
+import {login} from "../api/authApi.ts"
 
 // typy danych w kontekscie
 type AuthContextType = {
