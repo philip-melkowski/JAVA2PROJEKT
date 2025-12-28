@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Box, Button, TextField, Typography, Paper} from "@mui/material";
-import {login} from "../api/authApi";
+import {login} from "../auth/authApi";
 
 export default function LoginPage() {
 
