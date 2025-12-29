@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
-import {Box, Card, Divider, Stack, Typography, CardContent} from "@mui/material";
+import {Box, Divider, Stack, Typography} from "@mui/material";
+import BookCard from "../components/BookCard.tsx";
 
 
 
@@ -26,7 +27,7 @@ export default function BooksPage() {
     return (
 
         <Box
-            sx = {{flexGrow: 1, maxWidth: 550}}
+            sx = {{flexGrow: 1, maxWidth: 550, mx: "auto"}}
         >
         <Typography sx = {{mt: 4, mb:2 }} variant="h3" component="div">
             Książki ilosc: {booksList.length}
@@ -38,24 +39,7 @@ export default function BooksPage() {
 
             {booksList.map(book =>
                 (
-                    <Card
-                        //key={book.id}
-                        variant="outlined">
-                        <CardContent>
-                        <Typography
-                            variant="h5">
-                            Title: {book.title}
-                        </Typography>
-                        <Typography
-                            variant="subtitle1">
-                            Author: {book.authorName} {book.authorSurname}
-                        </Typography>
-                        <Typography
-                            variant="body2">
-                            Average rating: {book.averageRating}
-                        </Typography>
-                        </CardContent>
-                    </Card>
+                    <BookCard key={book.id} book={book} />
                 ))}
             </Stack>
         </Box>
