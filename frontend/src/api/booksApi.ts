@@ -42,5 +42,5 @@ export function getBooks(params: BookSearchParams) : Promise<Page<BookDTO>>{
     if(params.authorId != undefined) query.append("authorId", params.authorId.toString());
     if(params.title != undefined) query.append("title", params.title);
 
-    return apiFetch(`/api/books/search?${query.toString()}`);
+    return apiFetch(`api/books/search?${query.toString()}`);
 }
