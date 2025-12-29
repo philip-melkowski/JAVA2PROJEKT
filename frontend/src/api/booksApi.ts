@@ -27,7 +27,7 @@ export type BookSearchParams =
         sortBy?: string;
         order?: string;
         genre?: string;
-        authorId: number;
+        authorId?: number;
         title?: string;
 
     };
