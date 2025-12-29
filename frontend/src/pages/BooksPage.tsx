@@ -29,7 +29,7 @@ export default function BooksPage() {
             sx = {{flexGrow: 1, maxWidth: 550}}
         >
         <Typography sx = {{mt: 4, mb:2 }} variant="h3" component="div">
-            Książki
+            Książki ilosc: {booksList.length}
         </Typography>
             <Stack spacing={2}
                    divider = {<Divider orientation="horizontal" flexItem />}
@@ -39,6 +39,7 @@ export default function BooksPage() {
             {booksList.map(book =>
                 (
                     <Card
+                        //key={book.id}
                         variant="outlined">
                         <CardContent>
                         <Typography
@@ -46,11 +47,11 @@ export default function BooksPage() {
                             Title: {book.title}
                         </Typography>
                         <Typography
-                            variant="h6">
+                            variant="subtitle1">
                             Author: {book.authorName} {book.authorSurname}
                         </Typography>
                         <Typography
-                            variant="h6">
+                            variant="body2">
                             Average rating: {book.averageRating}
                         </Typography>
                         </CardContent>
