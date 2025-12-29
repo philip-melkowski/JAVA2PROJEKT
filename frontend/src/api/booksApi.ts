@@ -32,7 +32,7 @@ export type BookSearchParams =
 
     };
 
-export async function getBooks(params: BookSearchParams) : Promise<Page<BookDTO>>{
+export function getBooks(params: BookSearchParams) : Promise<Page<BookDTO>>{
     const query = new URLSearchParams();
     if(params.page != undefined) query.append("page", params.page.toString());
     if(params.size != undefined) query.append("size", params.size.toString());
