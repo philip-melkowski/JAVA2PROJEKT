@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
-import {Box, Divider, Stack, Typography} from "@mui/material";
+import {Box, Button, Divider, Stack, Typography} from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 
 
@@ -9,8 +9,8 @@ import BookCard from "../components/BookCard.tsx";
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-    const [totalPages, setTotalPages] = useState<number>();
+    const [pageSize, setPageSize] = useState(3);
+    const [totalPages, setTotalPages] = useState<number>(0);
     useEffect( () => {
         const fetchData = async () =>
         {
@@ -34,7 +34,7 @@ export default function BooksPage() {
             sx = {{flexGrow: 1, maxWidth: 550, mx: "auto"}}
         >
         <Typography sx = {{mt: 4, mb:2 }} variant="h3" component="div">
-            Książki ilosc: {booksList.length}
+            Książki ilość na stronie: {booksList.length}
         </Typography>
             <Stack spacing={2}
                    divider = {<Divider orientation="horizontal" flexItem />}
@@ -46,6 +46,20 @@ export default function BooksPage() {
                     <BookCard key={book.id} book={book} />
                 ))}
             </Stack>
+            <Button
+                onClick={() => {
+                    setCurrentPage(currentPage - 1);
+                }
+                }
+                disabled={currentPage === 0}
+            >Cofnij</Button>
+            <Button
+                onClick={() => {
+                    setCurrentPage(currentPage + 1);
+                }
+                }
+                disabled={currentPage === totalPages - 1}
+            >Dalej</Button>
         </Box>
 
     )
