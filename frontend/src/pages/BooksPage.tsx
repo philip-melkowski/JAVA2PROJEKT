@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
-import {Box, Button, Divider, Stack, Typography} from "@mui/material";
+import {Box, Divider, Pagination, Stack, Typography} from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 
 
@@ -26,7 +26,7 @@ export default function BooksPage() {
 
         }
         fetchData();
-    }, [currentPage]);
+    }, [currentPage, pageSize]);
 
     return (
 
@@ -46,20 +46,15 @@ export default function BooksPage() {
                     <BookCard key={book.id} book={book} />
                 ))}
             </Stack>
-            <Button
-                onClick={() => {
-                    setCurrentPage(currentPage - 1);
-                }
-                }
-                disabled={currentPage === 0}
-            >Cofnij</Button>
-            <Button
-                onClick={() => {
-                    setCurrentPage(currentPage + 1);
-                }
-                }
-                disabled={currentPage === totalPages - 1}
-            >Dalej</Button>
+            <Stack spacing={2}>
+            <Pagination
+                count={totalPages}
+                page= {currentPage + 1}
+                onChange={(e, value) => setCurrentPage(value-1)}
+                variant="outlined"
+                color="primary"
+            ></Pagination>
+            </Stack>
         </Box>
 
     )
