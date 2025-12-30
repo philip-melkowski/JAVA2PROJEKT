@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
-import {Box, Divider, Pagination, Stack, Typography} from "@mui/material";
+import {Box, Divider, MenuItem, Pagination, Select, Stack, Typography} from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 
 
@@ -33,14 +33,29 @@ export default function BooksPage() {
         <Box
             sx = {{flexGrow: 1, maxWidth: 550, mx: "auto"}}
         >
+            <Stack spacing={44}
+            direction="row">
         <Typography sx = {{mt: 4, mb:2 }} variant="h3" component="div">
-            Książki ilość na stronie: {booksList.length}
+            Książki
         </Typography>
+                <Select
+                    value={pageSize}
+                    label="Books per page"
+                    onChange={(e) =>
+                    {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(0);
+                    }
+                    }
+                >
+                    <MenuItem value={3}>3</MenuItem>
+                    <MenuItem value={5}>5</MenuItem>
+                    <MenuItem value={10}>10</MenuItem>
+                </Select>
+            </Stack>
             <Stack spacing={2}
                    divider = {<Divider orientation="horizontal" flexItem />}
             >
-
-
             {booksList.map(book =>
                 (
                     <BookCard key={book.id} book={book} />
