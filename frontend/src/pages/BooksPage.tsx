@@ -8,21 +8,25 @@ import BookCard from "../components/BookCard.tsx";
 
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState<number>();
     useEffect( () => {
         const fetchData = async () =>
         {
             const books = await getBooks({
-                page: 0,
-                size: 10,
+                page: currentPage,
+                size: pageSize,
                 sortBy: "title",
                 order: "asc"
             });
             console.log(books);
             setBooksList(books.content);
+            setTotalPages(books.totalPages);
 
         }
         fetchData();
-    }, []);
+    }, [currentPage]);
 
     return (
 
