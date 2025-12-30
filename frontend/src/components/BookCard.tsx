@@ -18,6 +18,14 @@ export default function BookCard({book}: BookCardProps) {
                 Author: {book.authorName} {book.authorSurname}
             </Typography>
             <Typography
+                variant="body1">
+                Publish Year: {book.publishYear}
+            </Typography>
+            <Typography
+                variant="body1">
+                Genre: {book.genre}
+            </Typography>
+            <Typography
                 variant="body2">
                 Average rating: {book.averageRating}
             </Typography>
