@@ -10,7 +10,7 @@ import {
     Select,
     Stack,
     TextField,
-    Typography
+    Typography,
 } from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
@@ -44,6 +44,7 @@ export default function BooksPage() {
     const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
     const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
+    const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>();
     const [genreFilter, setGenreFilter] = useState<Genre>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
@@ -60,14 +61,14 @@ export default function BooksPage() {
                 order: order,
                 genre: genreFilter,
                 authorId: authorFilter?.id,
-                title: titleFilter,
+                title: debounceTitleFilter,
             });
             setBooksList(books.content);
             setTotalPages(books.totalPages);
 
         }
         fetchData();
-    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, titleFilter]);
+    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, debounceTitleFilter]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -75,6 +76,13 @@ export default function BooksPage() {
         }, 500);
         return () => clearTimeout(timeout);
     }, [authorInputValue]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setDebounceTitleFilter(titleFilter);
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [titleFilter]);
 
     useEffect(() => {
         const fetchData = async () =>
@@ -135,6 +143,18 @@ export default function BooksPage() {
                         ))
                     }
                 </Select>
+                <TextField
+                    id="title-filter-field"
+                    label="Filter by Title"
+                    type="search"
+                    variant="outlined"
+                    onChange={(e) =>
+                    {
+                        setTitleFilter(e.target.value === "" ? null : e.target.value);
+                        setCurrentPage(0);
+                    }
+                }
+                />
                 <Select
                     value={sortBy}
                     label="Sort by"
