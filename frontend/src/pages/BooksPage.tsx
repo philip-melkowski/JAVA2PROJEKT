@@ -93,7 +93,11 @@ export default function BooksPage() {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     sx={{ width: 350 }}
                     value={authorFilter}
-                    onChange={(e, newValue) => setAuthorFilter(newValue)}
+                    onChange={(e, newValue) => {
+                        setAuthorFilter(newValue);
+                        setCurrentPage(0);
+                    }
+                }
 
                     inputValue={authorInputValue}
                     onInputChange={
