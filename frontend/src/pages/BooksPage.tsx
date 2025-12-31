@@ -44,7 +44,7 @@ export default function BooksPage() {
     const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
     const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
-    const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>();
+    const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
     const [genreFilter, setGenreFilter] = useState<Genre>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
