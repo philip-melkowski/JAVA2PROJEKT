@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
-import {type AuthorDTO, getAllAuthors, findCaseInsensitive} from "../api/authorsApi.ts";
+import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
 
 
 type SortField = "title" | "publishYear" | "genre";
@@ -33,8 +33,9 @@ export default function BooksPage() {
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
     const [genreFilter, setGenreFilter] = useState<Genre>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
-    const [authors, setAuthors] = useState<Author[]>(null);
-
+    const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
+    const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
+    const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
 
     useEffect( () => {
         const fetchData = async () =>
@@ -48,13 +49,32 @@ export default function BooksPage() {
                 authorId: authorFilter?.id,
                 title: titleFilter,
             });
-            console.log(books);
             setBooksList(books.content);
             setTotalPages(books.totalPages);
 
         }
         fetchData();
-    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, titleFilter, authors]);
+    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, titleFilter]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setDebounceAuthorInputValue(authorInputValue);
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [authorInputValue]);
+
+    useEffect(() => {
+        const fetchData = async () =>
+        {
+            const authors = await findCaseInsensitive(
+                {
+                    fragment: debounceAuthorInputValue
+                }
+            );
+            setAuthors(authors);
+        }
+        fetchData();
+    }, [debounceAuthorInputValue]);
 
     return (
         <Box
@@ -66,10 +86,20 @@ export default function BooksPage() {
                     GoodReadsPL
                 </Typography>
                 <Autocomplete
+                    id="autocomplete-author-fitler"
                     disablePortal
-                    options={top100Films}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="Movie" />}
+                    options={authors ?? []}
+                    getOptionLabel={(option) => option.name + " " + option.surname}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    sx={{ width: 350 }}
+                    value={authorFilter}
+                    onChange={(e, newValue) => setAuthorFilter(newValue)}
+
+                    inputValue={authorInputValue}
+                    onInputChange={
+                    (e, newInputValue) => setAuthorInputValue(newInputValue)}
+
+                    renderInput={(params) => <TextField {...params} label="Author" />}
                 />
                 <Select
                     value={sortBy}
