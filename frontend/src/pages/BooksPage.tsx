@@ -20,8 +20,21 @@ type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
 type Title = string | null;
 type Author = AuthorDTO | null; // autor, po którym filtrujemy.
-type Genre =  "FANTASY" | "SCI_FI" | "ROMANCE" | "HISTORY" | "HORROR" | "BIOGRAPHY" | "THRILLER" |
-    "ADVENTURE" | "POETRY" | "DRAMA" | null;
+
+const GENRES = [
+    "FANTASY",
+    "SCI_FI",
+    "ROMANCE",
+    "HISTORY",
+    "HORROR",
+    "BIOGRAPHY",
+    "THRILLER",
+    "ADVENTURE",
+    "POETRY",
+    "DRAMA",
+] as const;
+
+type Genre = (typeof GENRES)[number] | null;
 
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
@@ -103,8 +116,25 @@ export default function BooksPage() {
                     onInputChange={
                     (e, newInputValue) => setAuthorInputValue(newInputValue)}
 
-                    renderInput={(params) => <TextField {...params} label="Author" />}
+                    renderInput={(params) => <TextField {...params} label="Author Filter" />}
                 />
+                <Select
+                    value={genreFilter}
+                    label="Genre Filter"
+                    onChange={(e) => {
+                        setGenreFilter(e.target.value as Genre);
+                        setCurrentPage(0);
+                    }}
+                >
+                    <MenuItem
+                        value={null}
+                    >All Genres</MenuItem>
+                    {
+                        GENRES.map(genre => (
+                            <MenuItem key={genre} value={genre}>{genre}</MenuItem>
+                        ))
+                    }
+                </Select>
                 <Select
                     value={sortBy}
                     label="Sort by"
