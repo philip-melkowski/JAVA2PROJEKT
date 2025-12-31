@@ -119,15 +119,15 @@ export default function BooksPage() {
                     renderInput={(params) => <TextField {...params} label="Author Filter" />}
                 />
                 <Select
-                    value={genreFilter}
+                    value={genreFilter ?? ""}
                     label="Genre Filter"
                     onChange={(e) => {
-                        setGenreFilter(e.target.value as Genre);
+                        setGenreFilter(e.target.value === "" ? null : e.target.value as Genre);
                         setCurrentPage(0);
                     }}
                 >
                     <MenuItem
-                        value={null}
+                        value={""}
                     >All Genres</MenuItem>
                     {
                         GENRES.map(genre => (
