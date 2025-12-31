@@ -1,19 +1,41 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
-import {Box, Button, Divider, MenuItem, Pagination, Select, Stack, Typography} from "@mui/material";
+import {
+    Autocomplete,
+    Box,
+    Button,
+    Divider,
+    MenuItem,
+    Pagination,
+    Select,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
+import {type AuthorDTO, getAllAuthors, findCaseInsensitive} from "../api/authorsApi.ts";
 
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
+type Title = string | null;
+type Author = AuthorDTO | null; // autor, po którym filtrujemy.
+type Genre =  "FANTASY" | "SCI_FI" | "ROMANCE" | "HISTORY" | "HORROR" | "BIOGRAPHY" | "THRILLER" |
+    "ADVENTURE" | "POETRY" | "DRAMA" | null;
 
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(3);
     const [totalPages, setTotalPages] = useState<number>(0);
-    const [sortBy, setSortBy] = useState<SortField>("title");
-    const [order, setOrder] = useState<Order>("desc")
+    const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
+    const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
+    const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
+    const [genreFilter, setGenreFilter] = useState<Genre>(null); // gatunek, po którym filtrujemy
+    const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
+    const [authors, setAuthors] = useState<Author[]>(null);
+
+
     useEffect( () => {
         const fetchData = async () =>
         {
@@ -21,7 +43,10 @@ export default function BooksPage() {
                 page: currentPage,
                 size: pageSize,
                 sortBy: sortBy,
-                order: order
+                order: order,
+                genre: genreFilter,
+                authorId: authorFilter?.id,
+                title: titleFilter,
             });
             console.log(books);
             setBooksList(books.content);
@@ -29,7 +54,7 @@ export default function BooksPage() {
 
         }
         fetchData();
-    }, [currentPage, pageSize, sortBy, order]);
+    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, titleFilter, authors]);
 
     return (
         <Box
@@ -37,9 +62,15 @@ export default function BooksPage() {
         >
             <Stack spacing={5}
                    direction="row">
-                <Typography sx={{mt: 4, mb: 2}} variant="h3" component="div">
+                <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
                     GoodReadsPL
                 </Typography>
+                <Autocomplete
+                    disablePortal
+                    options={top100Films}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="Movie" />}
+                />
                 <Select
                     value={sortBy}
                     label="Sort by"
