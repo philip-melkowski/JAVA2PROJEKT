@@ -50,7 +50,7 @@ export default function BooksPage() {
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>();
 
     useEffect( () => {
         const fetchData = async () =>
@@ -115,6 +115,7 @@ export default function BooksPage() {
                     GoodReadsPL
                 </Typography>
                 <Autocomplete
+                    disabled={loading}
                     id="autocomplete-author-fitler"
                     disablePortal
                     options={authors ?? []}
@@ -135,6 +136,7 @@ export default function BooksPage() {
                     renderInput={(params) => <TextField {...params} label="Author Filter" />}
                 />
                 <Select
+                    disabled={loading}
                     value={genreFilter ?? ""}
                     label="Genre Filter"
                     onChange={(e) => {
@@ -152,6 +154,7 @@ export default function BooksPage() {
                     }
                 </Select>
                 <TextField
+                    disabled={loading}
                     id="title-filter-field"
                     label="Filter by Title"
                     type="search"
@@ -164,6 +167,7 @@ export default function BooksPage() {
                 }
                 />
                 <Select
+                    disabled={loading}
                     value={sortBy}
                     label="Sort by"
                     onChange={(e) => {
@@ -177,6 +181,7 @@ export default function BooksPage() {
                 </Select>
 
                 <Button
+                    disabled={loading}
                     variant="contained"
                     onClick={() => setOrder(order === "asc" ? "desc" : "asc")}
                 >
@@ -184,6 +189,7 @@ export default function BooksPage() {
                 </Button>
 
                 <Select
+                    disabled={loading}
                     value={pageSize}
                     label="Books per page"
                     onChange={(e) => {
@@ -196,15 +202,19 @@ export default function BooksPage() {
                     <MenuItem value={10}>10</MenuItem>
                 </Select>
             </Stack>
-            <Stack spacing={2}
+            {loading && <Typography variant="h3">Loading...</Typography>}
+            {!loading && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
+            {!loading && booksList.length > 0 && <Stack spacing={2}
                        divider={<Divider orientation="horizontal" flexItem/>}
         >
-            {booksList.map(book => (
+
+                {booksList.map(book => (
                 <BookCard key={book.id} book={book}/>
             ))}
-        </Stack>
+        </Stack> }
         <Stack spacing={2}>
             <Pagination
+                disabled={loading}
                 count={totalPages}
                 page={currentPage + 1}
                 onChange={(e, value) => setCurrentPage(value - 1)}
