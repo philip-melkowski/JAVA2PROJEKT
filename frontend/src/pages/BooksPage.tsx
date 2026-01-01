@@ -50,21 +50,29 @@ export default function BooksPage() {
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
+    const [loading, setLoading] = useState(true);
 
     useEffect( () => {
         const fetchData = async () =>
         {
-            const books = await getBooks({
-                page: currentPage,
-                size: pageSize,
-                sortBy: sortBy,
-                order: order,
-                genre: genreFilter,
-                authorId: authorFilter?.id,
-                title: debounceTitleFilter,
-            });
-            setBooksList(books.content);
-            setTotalPages(books.totalPages);
+            try {
+                setLoading(true);
+                const books = await getBooks({
+                    page: currentPage,
+                    size: pageSize,
+                    sortBy: sortBy,
+                    order: order,
+                    genre: genreFilter,
+                    authorId: authorFilter?.id,
+                    title: debounceTitleFilter,
+                });
+                setBooksList(books.content);
+                setTotalPages(books.totalPages);
+            }
+            finally {
+                setLoading(false);
+            }
+
 
         }
         fetchData();
