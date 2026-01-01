@@ -50,7 +50,7 @@ export default function BooksPage() {
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>();
+    const [loading, setLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
 
     useEffect( () => {
