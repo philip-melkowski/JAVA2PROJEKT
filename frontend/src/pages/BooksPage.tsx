@@ -38,7 +38,7 @@ type Genre = (typeof GENRES)[number] | null;
 
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState(3);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
@@ -53,35 +53,37 @@ export default function BooksPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
 
-    useEffect( () => {
-        const fetchData = async () =>
-        {
-            try {
-                setLoading(true);
-                const books = await getBooks({
-                    page: currentPage,
-                    size: pageSize,
-                    sortBy: sortBy,
-                    order: order,
-                    genre: genreFilter,
-                    authorId: authorFilter?.id,
-                    title: debounceTitleFilter,
-                });
-                setBooksList(books.content);
-                setTotalPages(books.totalPages);
-                setIsError(false);
-            }
-            catch (e)
-            {
-                setIsError(true);
-            }
-            finally {
-                setLoading(false);
-            }
-
-
+    const fetchBooks = async () =>
+    {
+        try {
+            setLoading(true);
+            const books = await getBooks({
+                page: currentPage,
+                size: pageSize,
+                sortBy: sortBy,
+                order: order,
+                genre: genreFilter,
+                authorId: authorFilter?.id,
+                title: debounceTitleFilter,
+            });
+            setBooksList(books.content);
+            setTotalPages(books.totalPages);
+            setIsError(false);
         }
-        fetchData();
+        catch (e)
+        {
+            setIsError(true);
+        }
+        finally {
+            setLoading(false);
+        }
+
+
+    }
+
+
+    useEffect( () => {
+        fetchBooks();
     }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, debounceTitleFilter]);
 
     useEffect(() => {
@@ -99,7 +101,7 @@ export default function BooksPage() {
     }, [titleFilter]);
 
     useEffect(() => {
-        const fetchData = async () =>
+        const fetchAuthors = async () =>
         {
             const authors = await findCaseInsensitive(
                 {
@@ -108,7 +110,7 @@ export default function BooksPage() {
             );
             setAuthors(authors);
         }
-        fetchData();
+        fetchAuthors();
     }, [debounceAuthorInputValue]);
 
     return (
@@ -210,7 +212,16 @@ export default function BooksPage() {
             </Stack>
             {loading && !isError && <Typography variant="h3">Loading...</Typography>}
             {!loading && !isError && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
-            {!loading && isError && <Typography variant="h3">Error</Typography>}
+            {!loading && isError &&
+                <Button
+                    onClick={(e) =>
+                    {
+                        setIsError(false);
+                        fetchBooks();
+                    }
+                    }
+                >Retry loading</Button>
+            }
             {!loading && !isError && booksList.length > 0 && <Stack spacing={2}
                        divider={<Divider orientation="horizontal" flexItem/>}
         >
