@@ -32,4 +32,7 @@ public class ReviewDTO {
     // a nie nazwa uzytkownika czy tytul ksiazki
     private String username;   // nazwa użytkownika, jeśli chcesz pokazywać kto dodał recenzję
     private String bookTitle;  // tytuł książki, jeśli chcesz pokazywać przy recenzjach
+
+    private String authorName;
+    private String authorSurname;
 }
