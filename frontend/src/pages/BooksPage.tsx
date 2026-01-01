@@ -51,6 +51,7 @@ export default function BooksPage() {
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
     const [loading, setLoading] = useState<boolean>();
+    const [isError, setIsError] = useState<boolean>(false);
 
     useEffect( () => {
         const fetchData = async () =>
@@ -68,6 +69,11 @@ export default function BooksPage() {
                 });
                 setBooksList(books.content);
                 setTotalPages(books.totalPages);
+                setIsError(false);
+            }
+            catch (e)
+            {
+                setIsError(true);
             }
             finally {
                 setLoading(false);
