@@ -121,7 +121,7 @@ export default function BooksPage() {
                     GoodReadsPL
                 </Typography>
                 <Autocomplete
-                    disabled={loading}
+                    disabled={loading || isError}
                     id="autocomplete-author-fitler"
                     disablePortal
                     options={authors ?? []}
@@ -142,7 +142,7 @@ export default function BooksPage() {
                     renderInput={(params) => <TextField {...params} label="Author Filter" />}
                 />
                 <Select
-                    disabled={loading}
+                    disabled={loading || isError}
                     value={genreFilter ?? ""}
                     label="Genre Filter"
                     onChange={(e) => {
@@ -160,7 +160,7 @@ export default function BooksPage() {
                     }
                 </Select>
                 <TextField
-                    disabled={loading}
+                    disabled={loading || isError}
                     id="title-filter-field"
                     label="Filter by Title"
                     type="search"
@@ -173,7 +173,7 @@ export default function BooksPage() {
                 }
                 />
                 <Select
-                    disabled={loading}
+                    disabled={loading || isError}
                     value={sortBy}
                     label="Sort by"
                     onChange={(e) => {
@@ -187,7 +187,7 @@ export default function BooksPage() {
                 </Select>
 
                 <Button
-                    disabled={loading}
+                    disabled={loading || isError}
                     variant="contained"
                     onClick={() => setOrder(order === "asc" ? "desc" : "asc")}
                 >
@@ -195,7 +195,7 @@ export default function BooksPage() {
                 </Button>
 
                 <Select
-                    disabled={loading}
+                    disabled={loading || isError}
                     value={pageSize}
                     label="Books per page"
                     onChange={(e) => {
@@ -208,12 +208,12 @@ export default function BooksPage() {
                     <MenuItem value={10}>10</MenuItem>
                 </Select>
             </Stack>
-            {loading && <Typography variant="h3">Loading...</Typography>}
-            {!loading && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
-            {!loading && booksList.length > 0 && <Stack spacing={2}
+            {loading && !isError && <Typography variant="h3">Loading...</Typography>}
+            {!loading && !isError && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
+            {!loading && isError && <Typography variant="h3">Error</Typography>}
+            {!loading && !isError && booksList.length > 0 && <Stack spacing={2}
                        divider={<Divider orientation="horizontal" flexItem/>}
         >
-
                 {booksList.map(book => (
                 <BookCard key={book.id} book={book}/>
             ))}
