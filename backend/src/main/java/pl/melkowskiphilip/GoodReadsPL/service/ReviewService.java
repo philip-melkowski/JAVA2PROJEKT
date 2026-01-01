@@ -161,6 +161,8 @@ public class ReviewService {
         dto.setComment(review.getComment());
         dto.setBookId(review.getBook().getId());
         dto.setUserId(review.getUser().getId());
+        dto.setAuthorName(review.getBook().getAuthor().getName());
+        dto.setAuthorSurname(review.getBook().getAuthor().getSurname());
         return dto;
     }
 }
