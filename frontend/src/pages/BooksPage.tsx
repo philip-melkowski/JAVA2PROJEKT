@@ -1,25 +1,23 @@
 import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
 import {
-    Autocomplete,
     Box,
     Button,
     Divider,
-    MenuItem,
     Pagination,
-    Select,
     Stack,
-    TextField,
     Typography,
 } from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
 import {type Genre, GENRES} from "../types/Genre.ts";
+import {BooksFiltersBar} from "../components/BooksFiltersBar.tsx";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
 type Title = string | null;
 type Author = AuthorDTO | null; // autor, po którym filtrujemy.
+
 
 
 
@@ -100,6 +98,10 @@ export default function BooksPage() {
         fetchAuthors();
     }, [debounceAuthorInputValue]);
 
+    function resetPage(): void
+    {
+        setCurrentPage(0);
+    }
     return (
         <Box
             sx={{flexGrow: 1, maxWidth: 550, mx: "auto"}}
@@ -109,93 +111,7 @@ export default function BooksPage() {
                 <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
                     GoodReadsPL
                 </Typography>
-                <Autocomplete
-                    disabled={loading || isError}
-                    id="autocomplete-author-fitler"
-                    disablePortal
-                    options={authors ?? []}
-                    getOptionLabel={(option) => option.name + " " + option.surname}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    sx={{ width: 350 }}
-                    value={authorFilter}
-                    onChange={(e, newValue) => {
-                        setAuthorFilter(newValue);
-                        setCurrentPage(0);
-                    }
-                }
-
-                    inputValue={authorInputValue}
-                    onInputChange={
-                    (e, newInputValue) => setAuthorInputValue(newInputValue)}
-
-                    renderInput={(params) => <TextField {...params} label="Author Filter" />}
-                />
-                <Select
-                    disabled={loading || isError}
-                    value={genreFilter ?? ""}
-                    label="Genre Filter"
-                    onChange={(e) => {
-                        setGenreFilter(e.target.value === "" ? null : e.target.value as Genre);
-                        setCurrentPage(0);
-                    }}
-                >
-                    <MenuItem
-                        value={""}
-                    >All Genres</MenuItem>
-                    {
-                        GENRES.map(genre => (
-                            <MenuItem key={genre} value={genre}>{genre}</MenuItem>
-                        ))
-                    }
-                </Select>
-                <TextField
-                    disabled={loading || isError}
-                    id="title-filter-field"
-                    label="Filter by Title"
-                    type="search"
-                    variant="outlined"
-                    onChange={(e) =>
-                    {
-                        setTitleFilter(e.target.value === "" ? null : e.target.value);
-                        setCurrentPage(0);
-                    }
-                }
-                />
-                <Select
-                    disabled={loading || isError}
-                    value={sortBy}
-                    label="Sort by"
-                    onChange={(e) => {
-                        setSortBy(e.target.value);
-                        setCurrentPage(0);
-                    }}
-                >
-                    <MenuItem value="title">Title</MenuItem>
-                    <MenuItem value="publishYear">Publish Year</MenuItem>
-                    <MenuItem value="genre">Genre</MenuItem>
-                </Select>
-
-                <Button
-                    disabled={loading || isError}
-                    variant="contained"
-                    onClick={() => setOrder(order === "asc" ? "desc" : "asc")}
-                >
-                    {order === "asc" ? "Sort ascending" : "Sort descending"}
-                </Button>
-
-                <Select
-                    disabled={loading || isError}
-                    value={pageSize}
-                    label="Books per page"
-                    onChange={(e) => {
-                        setPageSize(Number(e.target.value));
-                        setCurrentPage(0);
-                    }}
-                >
-                    <MenuItem value={3}>3</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={10}>10</MenuItem>
-                </Select>
+                <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={authorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
             {loading && !isError && <Typography variant="h3">Loading...</Typography>}
             {!loading && !isError && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
