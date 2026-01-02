@@ -13,7 +13,6 @@ export default function DashboardPage() {
                 sx = {{padding: 10, width: 50, height: 20, color: "blue"}}
                 variant="contained"
                 color="secondary"
-                align="right"
                 onClick={logout}
             >Wyloguj się</Button>
             <Typography variant="h5" align="center" mb={2}>

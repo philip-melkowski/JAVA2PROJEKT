@@ -117,7 +117,7 @@ export default function BooksPage() {
                 disabled={loading}
                 count={totalPages}
                 page={currentPage + 1}
-                onChange={(e, value) => setCurrentPage(value - 1)}
+                onChange={(_, value) => setCurrentPage(value - 1)}
                 variant="outlined"
                 color="primary"
             ></Pagination>
