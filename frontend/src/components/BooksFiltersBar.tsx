@@ -32,3 +32,12 @@ export type FilterBarProps =
     pageSize: number;
     onPageSizeChange: (size: number) => void;
 };
+
+export function BooksFiltersBar(props: FilterBarProps)
+{
+    return (
+            <>
+
+            </>
+    )
+}
