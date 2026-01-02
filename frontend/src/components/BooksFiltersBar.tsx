@@ -50,7 +50,7 @@ export function BooksFiltersBar(props: FilterBarProps)
                     value={props.authorFilter}
                     onChange={(e, newValue) => {
                         props.onAuthorChange(newValue);
-                        setCurrentPage(0);
+                        props.onPageReset();
                     }
                     }
 
