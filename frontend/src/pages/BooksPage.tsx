@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
-import {Genre} from "../types/Genre.ts";
+import {Genre, GENRES} from "../types/Genre.ts";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
