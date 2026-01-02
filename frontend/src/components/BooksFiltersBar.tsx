@@ -73,7 +73,7 @@ export function BooksFiltersBar(props: FilterBarProps)
                         value={""}
                     >All Genres</MenuItem>
                     {
-                        GENRES.map(genre => (
+                        props.genres.map(genre => (
                             <MenuItem key={genre} value={genre}>{genre}</MenuItem>
                         ))
                     }
