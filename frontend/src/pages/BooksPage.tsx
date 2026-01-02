@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
 import {
     Box,
@@ -36,7 +36,7 @@ export default function BooksPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
 
-    const fetchBooks = async () =>
+    const fetchBooks = useCallback(async () =>
     {
         try {
             setLoading(true);
@@ -47,7 +47,7 @@ export default function BooksPage() {
                 order: order,
                 authorId: authorFilter?.id,
                 ...(genreFilter ? {genre: genreFilter} : {}),
-                ...(titleFilter ? {title: titleFilter} : {})
+                ...(debounceTitleFilter ? {title: debounceTitleFilter} : {})
             });
             setBooksList(books.content);
             setTotalPages(books.totalPages);
@@ -62,12 +62,12 @@ export default function BooksPage() {
         }
 
 
-    }
+    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, debounceTitleFilter]);
 
 
     useEffect( () => {
         fetchBooks();
-    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, debounceTitleFilter]);
+    }, [fetchBooks]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
