@@ -14,27 +14,14 @@ import {
 } from "@mui/material";
 import BookCard from "../components/BookCard.tsx";
 import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
-
+import {Genre} from "../types/Genre.ts";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
 type Title = string | null;
 type Author = AuthorDTO | null; // autor, po którym filtrujemy.
 
-const GENRES = [
-    "FANTASY",
-    "SCI_FI",
-    "ROMANCE",
-    "HISTORY",
-    "HORROR",
-    "BIOGRAPHY",
-    "THRILLER",
-    "ADVENTURE",
-    "POETRY",
-    "DRAMA",
-] as const;
 
-type Genre = (typeof GENRES)[number] | null;
 
 export default function BooksPage() {
     const [booksList, setBooksList] = useState<BookDTO[]>([]);
@@ -45,7 +32,7 @@ export default function BooksPage() {
     const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
     const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
-    const [genreFilter, setGenreFilter] = useState<Genre>(null); // gatunek, po którym filtrujemy
+    const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
     const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
