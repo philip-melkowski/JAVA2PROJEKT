@@ -53,7 +53,7 @@ export default function BooksPage() {
             setTotalPages(books.totalPages);
             setIsError(false);
         }
-        catch (e)
+        catch
         {
             setIsError(true);
         }
