@@ -1,0 +1,32 @@
+import type {BookDTO} from "../api/booksApi.ts";
+import BookCard from "./BookCard.tsx";
+import {Button, Divider, Stack, Typography} from "@mui/material";
+
+export type BooksListProps = {
+    loading: boolean;
+    isError: boolean;
+    onRetry: () => void;
+    books: BookDTO[];
+}
+
+export function BooksListSection(props: BooksListProps) {
+    return (<>
+        {(props.loading) && !(props.isError) && <Typography variant="h3">Loading...</Typography>}
+    {!props.loading && !props.isError && props.books.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
+    {!props.loading && props.isError &&
+    <Button
+        onClick={() =>
+        {   props.onRetry(); }
+        }
+    >Retry loading</Button>
+    }
+    {!props.loading && !props.isError && props.books.length > 0 && <Stack spacing={2}
+                                                            divider={<Divider orientation="horizontal" flexItem/>}
+    >
+        {props.books.map(book => (
+            <BookCard key={book.id} book={book}/>
+        ))}
+    </Stack> }
+    </>
+    );
+}

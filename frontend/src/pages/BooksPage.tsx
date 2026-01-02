@@ -2,21 +2,19 @@ import {useEffect, useState} from "react";
 import {type BookDTO, getBooks} from "../api/booksApi.ts";
 import {
     Box,
-    Button,
-    Divider,
     Pagination,
     Stack,
     Typography,
 } from "@mui/material";
-import BookCard from "../components/BookCard.tsx";
 import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
 import {type Genre, GENRES} from "../types/Genre.ts";
 import {BooksFiltersBar} from "../components/BooksFiltersBar.tsx";
+import {BooksListSection} from "../components/BooksListSection.tsx";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
 type Title = string | null;
-type Author = AuthorDTO | null; // autor, po którym filtrujemy.
+
 
 
 
@@ -31,8 +29,8 @@ export default function BooksPage() {
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
     const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
     const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
-    const [authorFilter, setAuthorFilter] = useState<Author>(null); // autor po którym filtrujemy
-    const [authors, setAuthors] = useState<Author[]>([]); // lista autorów wszytkich
+    const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
+    const [authors, setAuthors] = useState<AuthorDTO[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
@@ -113,25 +111,7 @@ export default function BooksPage() {
                 </Typography>
                 <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={authorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
-            {loading && !isError && <Typography variant="h3">Loading...</Typography>}
-            {!loading && !isError && booksList.length === 0 && <Typography variant="h3">No Books to list. Change your filters.</Typography>}
-            {!loading && isError &&
-                <Button
-                    onClick={(e) =>
-                    {
-                        setIsError(false);
-                        fetchBooks();
-                    }
-                    }
-                >Retry loading</Button>
-            }
-            {!loading && !isError && booksList.length > 0 && <Stack spacing={2}
-                       divider={<Divider orientation="horizontal" flexItem/>}
-        >
-                {booksList.map(book => (
-                <BookCard key={book.id} book={book}/>
-            ))}
-        </Stack> }
+            <BooksListSection loading={loading} isError={isError} onRetry={() => { setIsError(false); fetchBooks()}} books={booksList}></BooksListSection>
         <Stack spacing={2}>
             <Pagination
                 disabled={loading}
