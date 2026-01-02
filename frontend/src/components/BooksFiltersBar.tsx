@@ -2,6 +2,8 @@ import {Autocomplete, Button, MenuItem, Select, TextField} from "@mui/material";
 import type {AuthorDTO} from "../api/authorsApi.ts";
 import {type Genre} from "../types/Genre.ts";
 
+type GenreSelectValue = Genre | "";
+
 export type FilterBarProps =
 {
     loading: boolean;
@@ -65,7 +67,8 @@ export function BooksFiltersBar(props: FilterBarProps)
                     value={props.genreFilter ?? ""}
                     label="Genre Filter"
                     onChange={(e) => {
-                        props.onGenreChange(e.target.value === "" ? null : e.target.value as Genre);
+                        const genreValue = e.target.value as GenreSelectValue;
+                        props.onGenreChange(genreValue === "" ? null : e.target.value as Genre);
                         props.onPageReset();
                     }}
                 >
