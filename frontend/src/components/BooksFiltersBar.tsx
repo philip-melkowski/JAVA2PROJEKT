@@ -50,7 +50,7 @@ export function BooksFiltersBar(props: FilterBarProps)
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     sx={{ width: 350 }}
                     value={props.authorFilter}
-                    onChange={(e, newValue) => {
+                    onChange={(_, newValue) => {
                         props.onAuthorChange(newValue);
                         props.onPageReset();
                     }
@@ -58,7 +58,7 @@ export function BooksFiltersBar(props: FilterBarProps)
 
                     inputValue={props.authorInputValue}
                     onInputChange={
-                        (e, newInputValue) => props.onAuthorInputChange(newInputValue)}
+                        (_, newInputValue) => props.onAuthorInputChange(newInputValue)}
 
                     renderInput={(params) => <TextField {...params} label="Author Filter" />}
                 />
