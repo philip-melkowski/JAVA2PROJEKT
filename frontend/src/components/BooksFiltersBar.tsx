@@ -1,6 +1,6 @@
 import {Autocomplete, Button, MenuItem, Select, TextField} from "@mui/material";
 import type {AuthorDTO} from "../api/authorsApi.ts";
-import {type Genre, GENRES} from "../types/Genre.ts";
+import {type Genre} from "../types/Genre.ts";
 
 export type FilterBarProps =
 {
