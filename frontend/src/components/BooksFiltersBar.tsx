@@ -2,7 +2,7 @@ import {Autocomplete, Button, MenuItem, Select, TextField} from "@mui/material";
 import type {AuthorDTO} from "../api/authorsApi.ts";
 import type {Genre} from "../types/Genre.ts";
 
-export type filterArgs =
+export type FilterBarProps =
 {
     loading: boolean;
     isError: boolean;
