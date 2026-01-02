@@ -45,9 +45,9 @@ export default function BooksPage() {
                 size: pageSize,
                 sortBy: sortBy,
                 order: order,
-                genre: genreFilter,
                 authorId: authorFilter?.id,
-                title: debounceTitleFilter,
+                ...(genreFilter ? {genre: genreFilter} : {}),
+                ...(titleFilter ? {title: titleFilter} : {})
             });
             setBooksList(books.content);
             setTotalPages(books.totalPages);
