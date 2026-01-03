@@ -1,5 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
-import {type BookDTO, getBooks} from "../api/booksApi.ts";
+import {useEffect, useState} from "react";
 import {
     Box,
     Pagination,
@@ -10,6 +9,7 @@ import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
 import {type Genre, GENRES} from "../types/Genre.ts";
 import {BooksFiltersBar} from "../components/BooksFiltersBar.tsx";
 import {BooksListSection} from "../components/BooksListSection.tsx";
+import {useBooks} from "../hooks/useBooks.ts";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
@@ -20,10 +20,6 @@ type Title = string | null;
 
 
 export default function BooksPage() {
-    const [booksList, setBooksList] = useState<BookDTO[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const [pageSize, setPageSize] = useState(3);
-    const [totalPages, setTotalPages] = useState<number>(0);
     const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
     const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
     const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
@@ -33,41 +29,25 @@ export default function BooksPage() {
     const [authors, setAuthors] = useState<AuthorDTO[]>([]); // lista autorów wszytkich
     const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
     const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
-    const [isError, setIsError] = useState<boolean>(false);
 
-    const fetchBooks = useCallback(async () =>
-    {
-        try {
-            setLoading(true);
-            const books = await getBooks({
-                page: currentPage,
-                size: pageSize,
-                sortBy: sortBy,
-                order: order,
-                authorId: authorFilter?.id,
-                ...(genreFilter ? {genre: genreFilter} : {}),
-                ...(debounceTitleFilter ? {title: debounceTitleFilter} : {})
-            });
-            setBooksList(books.content);
-            setTotalPages(books.totalPages);
-            setIsError(false);
-        }
-        catch
-        {
-            setIsError(true);
-        }
-        finally {
-            setLoading(false);
-        }
-
-
-    }, [currentPage, pageSize, sortBy, order, genreFilter, authorFilter, debounceTitleFilter]);
-
-
-    useEffect( () => {
-        fetchBooks();
-    }, [fetchBooks]);
+    const {
+        booksList,
+        currentPage,
+        pageSize,
+        totalPages,
+        loading,
+        isError,
+        resetPage,
+        retry,
+        setCurrentPage,
+        setPageSize
+    } = useBooks({
+        sortBy,
+        order,
+        genre: genreFilter ?? undefined,
+        authorId: authorFilter?.id,
+        title: debounceTitleFilter ?? undefined
+    });
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -96,10 +76,7 @@ export default function BooksPage() {
         fetchAuthors();
     }, [debounceAuthorInputValue]);
 
-    function resetPage(): void
-    {
-        setCurrentPage(0);
-    }
+
     return (
         <Box
             sx={{flexGrow: 1, maxWidth: 550, mx: "auto"}}
@@ -111,7 +88,7 @@ export default function BooksPage() {
                 </Typography>
                 <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={authorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
-            <BooksListSection loading={loading} isError={isError} onRetry={() => { setIsError(false); fetchBooks()}} books={booksList}></BooksListSection>
+            <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList}></BooksListSection>
         <Stack spacing={2}>
             <Pagination
                 disabled={loading}
