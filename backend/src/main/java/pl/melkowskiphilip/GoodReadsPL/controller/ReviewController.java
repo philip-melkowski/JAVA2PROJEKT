@@ -3,6 +3,7 @@ package pl.melkowskiphilip.GoodReadsPL.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.ReviewDTO;
 import pl.melkowskiphilip.GoodReadsPL.service.ReviewService;
@@ -23,8 +24,8 @@ public class ReviewController {
     @GetMapping("/allByBook/{id}")
     public ResponseEntity<List<ReviewDTO>> getAllByBook(@PathVariable Long id) { return ResponseEntity.ok(reviewService.findAllByBook(id)); }
 
-    @GetMapping("/allByUser/{id}")
-    public ResponseEntity<List<ReviewDTO>> getAllByUser(@PathVariable Long id) { return ResponseEntity.ok(reviewService.findAllByUser(id)); }
+    @GetMapping("/me")
+    public ResponseEntity<List<ReviewDTO>> getAllByUser(Authentication auth) { return ResponseEntity.ok(reviewService.findAllByCurrentUser(auth)); }
 
     @GetMapping("getByUserAndBook/{bookId}/{userId}")
     public ResponseEntity<ReviewDTO> getByUserAndBook(@PathVariable Long bookId, @PathVariable Long userId) { return ResponseEntity.ok(reviewService.findByBookAndUser(bookId, userId)); }

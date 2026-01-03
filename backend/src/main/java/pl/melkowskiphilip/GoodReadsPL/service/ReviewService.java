@@ -1,6 +1,8 @@
 package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.ReviewDTO;
@@ -42,8 +44,12 @@ public class ReviewService {
     }
 
     //  Recenzje konkretnego użytkownika
-    public List<ReviewDTO> findAllByUser(Long userId) {
-        return reviewRepository.findAllByUserId(userId)
+    public List<ReviewDTO> findAllByCurrentUser(Authentication auth) {
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+        User user = userRepository.findByUsernameIgnoreCase(userDetails.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
+        return reviewRepository.findAllByUserId(user.getId())
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
