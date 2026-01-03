@@ -65,7 +65,7 @@ public class ReviewService {
                 .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
 
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("error.book.notfound"));
+                .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
 
         // 2️⃣ Sprawdzenie, czy użytkownik już oceniał tę książkę
         if (reviewRepository.existsByBookIdAndUserId(dto.getBookId(), dto.getUserId())) {
