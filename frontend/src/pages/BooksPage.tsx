@@ -5,11 +5,12 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import {type AuthorDTO, findCaseInsensitive} from "../api/authorsApi.ts";
+import {type AuthorDTO} from "../api/authorsApi.ts";
 import {type Genre, GENRES} from "../types/Genre.ts";
 import {BooksFiltersBar} from "../components/BooksFiltersBar.tsx";
 import {BooksListSection} from "../components/BooksListSection.tsx";
 import {useBooks} from "../hooks/useBooks.ts";
+import {useAuthors} from "../hooks/useAuthors.ts";
 
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
@@ -26,9 +27,8 @@ export default function BooksPage() {
     const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
     const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
-    const [authors, setAuthors] = useState<AuthorDTO[]>([]); // lista autorów wszytkich
-    const [authorInputValue, setAuthorInputValue] = useState<string>(""); // wartość do filtrowania listy autorów
-    const [debounceAuthorInputValue, setDebounceAuthorInputValue] = useState<string>("");
+
+
 
     const {
         booksList,
@@ -49,12 +49,8 @@ export default function BooksPage() {
         title: debounceTitleFilter ?? undefined
     });
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setDebounceAuthorInputValue(authorInputValue);
-        }, 500);
-        return () => clearTimeout(timeout);
-    }, [authorInputValue]);
+    const {authors, debounceAuthorInputValue, setAuthorInputValue} = useAuthors();
+
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -63,18 +59,7 @@ export default function BooksPage() {
         return () => clearTimeout(timeout);
     }, [titleFilter]);
 
-    useEffect(() => {
-        const fetchAuthors = async () =>
-        {
-            const authors = await findCaseInsensitive(
-                {
-                    fragment: debounceAuthorInputValue
-                }
-            );
-            setAuthors(authors);
-        }
-        fetchAuthors();
-    }, [debounceAuthorInputValue]);
+
 
 
     return (
@@ -86,7 +71,7 @@ export default function BooksPage() {
                 <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
                     GoodReadsPL
                 </Typography>
-                <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={authorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
+                <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={debounceAuthorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
             <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList}></BooksListSection>
         <Stack spacing={2}>

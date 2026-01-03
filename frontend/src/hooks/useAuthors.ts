@@ -29,5 +29,5 @@ export function useAuthors() {
         return () => clearTimeout(timeout);
     }, [authorInputValue]);
 
-    return {authors, setAuthorInputValue}
+    return {authors, debounceAuthorInputValue, setAuthorInputValue}
 }
