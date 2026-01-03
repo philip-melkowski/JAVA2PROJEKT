@@ -25,7 +25,7 @@ export function useAuthors() {
     useEffect(() => {
         const timeout = setTimeout(() => {
             setDebounceAuthorInputValue(authorInputValue);
-        }, 500);
+        }, 100);
         return () => clearTimeout(timeout);
     }, [authorInputValue]);
 

@@ -55,7 +55,7 @@ export default function BooksPage() {
     useEffect(() => {
         const timeout = setTimeout(() => {
             setDebounceTitleFilter(titleFilter);
-        }, 500);
+        }, 100);
         return () => clearTimeout(timeout);
     }, [titleFilter]);
 
