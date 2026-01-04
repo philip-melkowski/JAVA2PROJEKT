@@ -4,7 +4,11 @@ import org.springframework.data.jpa.domain.Specification;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
 
-import jakarta.persistence.criteria.Predicate;
+
+
+import java.util.Set;
+
+
 
 
 // cb.conjunction() - to jest odpowiednik true w SQL
@@ -43,4 +47,16 @@ public class BookSpecification {
             );
         };
     }
+
+    public static Specification<Book> notReviewedByUser(Set<Long> reviewedBooksIds) {
+        return (root, query, cb) ->
+        {
+            if( reviewedBooksIds == null || reviewedBooksIds.isEmpty() ) {
+                return cb.conjunction();
+            }
+            return cb.not(root.get("id").in(reviewedBooksIds));
+        }
+    }
+
+
 }
