@@ -23,8 +23,11 @@ export function BooksListSection(props: BooksListProps) {
     {!props.loading && !props.isError && props.books.length > 0 && <Stack spacing={2}
                                                             divider={<Divider orientation="horizontal" flexItem/>}
     >
-        {props.books.map(book => (
-            <BookCard key={book.id} book={book}/>
+        {props.books.map(book => (<>
+            <BookCard key={book.id} book={book}/><Button
+            variant="contained"
+            onClick={() => console.log("ADDED REVIEW for book ID: ", book.id)}
+            ></Button></>
         ))}
     </Stack> }
     </>
