@@ -2,6 +2,7 @@ package pl.melkowskiphilip.GoodReadsPL.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import pl.melkowskiphilip.GoodReadsPL.entity.Review;
 
 import java.util.List;
@@ -18,6 +19,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     where r.user.id = :userId
     """)
     List<Review> findAllByUserId(Long id);
+
+    @Query("""
+    select r.book.id from Review r
+        where r.user.id = :userId
+    """)
+    List<Long> findReviewedBooksIdsByUserId(@Param("userId") Long userId);
 
     boolean existsByBookIdAndUserId(Long bookId, Long userId);
 
