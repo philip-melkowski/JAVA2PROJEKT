@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.service.BookService;
 
 import javax.validation.Valid;
@@ -75,6 +76,8 @@ public class BookController {
             @RequestParam(required = false) String title,
             Authentication authentication
     ) {
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         return ResponseEntity.ok(
                 bookService.searchBooks(page, size, sortBy, order, genre, authorId, title)
         );

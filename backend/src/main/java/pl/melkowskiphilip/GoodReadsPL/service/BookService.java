@@ -15,7 +15,10 @@ import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookAlreadyExistsExceptio
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
+import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
 import pl.melkowskiphilip.GoodReadsPL.specification.BookSpecification;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final ReviewRepository reviewRepository;
 
     /* =========================================================
        =============== DEPRECATED – NIE UŻYWANE =================
@@ -72,6 +76,7 @@ public class BookService {
             Genre genre,
             Long authorId,
             String title
+
     ) {
         // 🔒 zabezpieczenie – averageRating NIE jest polem encji
         if ("averageRating".equals(sortBy)) {
@@ -83,6 +88,9 @@ public class BookService {
                 : Sort.by(sortBy).ascending();
 
         PageRequest pageable = PageRequest.of(page, size, sort);
+
+
+
 
         var specification = BookSpecification
                 .hasGenre(genre)

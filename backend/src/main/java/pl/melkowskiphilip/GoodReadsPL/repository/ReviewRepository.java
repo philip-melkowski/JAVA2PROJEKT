@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pl.melkowskiphilip.GoodReadsPL.entity.Review;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,4 +36,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Zwraca wszystkie recenzje książki o określonej ocenie (rating = x), które mają komentarz
     List<Review> findAllByBookIdAndRatingAndCommentIsNotNull(Long bookId, int rating);
+
+    Long user(User user);
 }
