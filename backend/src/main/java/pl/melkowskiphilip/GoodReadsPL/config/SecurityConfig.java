@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.melkowskiphilip.GoodReadsPL.security.filter.JWTAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -50,7 +50,7 @@ public class SecurityConfig {
 
 
         // wpiecie filtra tokenem JWT przed AuthFilter bo wybierany jest na zasadzie kto pierwszy
-        http.addFilterBefore(jwtAuthFilter, AuthorizationFilter.class);
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

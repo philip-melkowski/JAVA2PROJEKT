@@ -3,6 +3,7 @@ package pl.melkowskiphilip.GoodReadsPL.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
@@ -71,7 +72,8 @@ public class BookController {
             @RequestParam(defaultValue = "asc") String order,
             @RequestParam(required = false) Genre genre,
             @RequestParam(required = false) Long authorId,
-            @RequestParam(required = false) String title
+            @RequestParam(required = false) String title,
+            Authentication authentication
     ) {
         return ResponseEntity.ok(
                 bookService.searchBooks(page, size, sortBy, order, genre, authorId, title)

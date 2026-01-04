@@ -1,8 +1,0 @@
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/GoodReadsPlApplicationTests.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/auth/AuthServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/security/JWT/JWTServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/service/ActivationTokenServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/service/AuthorServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/service/BookServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/service/ReviewServiceTest.java
-/Users/melkowskiphilip/Desktop/GOODREADS/GoodReadsPL/backend/src/test/java/pl/melkowskiphilip/GoodReadsPL/service/UserServiceTest.java
