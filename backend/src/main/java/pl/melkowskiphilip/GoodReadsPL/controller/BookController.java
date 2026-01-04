@@ -79,7 +79,7 @@ public class BookController {
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         return ResponseEntity.ok(
-                bookService.searchBooks(page, size, sortBy, order, genre, authorId, title)
+                bookService.searchBooks(page, size, sortBy, order, genre, authorId, title, userId)
         );
     }
 

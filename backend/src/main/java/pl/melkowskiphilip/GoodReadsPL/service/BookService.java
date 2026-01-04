@@ -19,6 +19,7 @@ import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
 import pl.melkowskiphilip.GoodReadsPL.specification.BookSpecification;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +76,8 @@ public class BookService {
             String order,
             Genre genre,
             Long authorId,
-            String title
+            String title,
+            Long userId
 
     ) {
         // 🔒 zabezpieczenie – averageRating NIE jest polem encji
@@ -89,13 +91,17 @@ public class BookService {
 
         PageRequest pageable = PageRequest.of(page, size, sort);
 
-
+        Set<Long> reviewedBookIds =
+                reviewRepository.findReviewedBooksIdsByUserId(userId)
+                        .stream()
+                        .collect(Collectors.toSet());
 
 
         var specification = BookSpecification
                 .hasGenre(genre)
                 .and(BookSpecification.hasAuthor(authorId))
-                .and(BookSpecification.titleContains(title));
+                .and(BookSpecification.titleContains(title))
+                .and(BookSpecification.notReviewedByUser(reviewedBookIds));
 
         return bookRepository.findAll(specification, pageable)
                 .map(this::toDTO);
