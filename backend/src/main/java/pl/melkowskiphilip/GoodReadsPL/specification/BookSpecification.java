@@ -55,7 +55,7 @@ public class BookSpecification {
                 return cb.conjunction();
             }
             return cb.not(root.get("id").in(reviewedBooksIds));
-        }
+        };
     }
 
 
