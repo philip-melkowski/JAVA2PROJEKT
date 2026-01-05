@@ -26,14 +26,15 @@ export function BooksListSection(props: BooksListProps) {
                 }
     >
         {props.books.map(book => (<Stack
+                key={book.id}
             direction="row">
-            <Stack sx={{ width: 420 }}><BookCard key={book.id} book={book}/>
-            </Stack>
+            <Stack sx={{ width: 420 }}><BookCard book={book}/>
+
                 <Button
                 sx={{ width: 80, height: 40, alignSelf: "center" }}
             variant="contained"
             onClick={() => console.log("ADDED REVIEW for book ID: ", book.id)}
-            ></Button></Stack>
+            ></Button></Stack></Stack>
         ))}
     </Stack> }
     </>
