@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import {
-    Box, Dialog, DialogTitle,
-    Pagination,
-    Stack,
+    Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, InputLabel, MenuItem,
+    Pagination, Select,
+    Stack, TextField,
     Typography,
 } from "@mui/material";
 import {type AuthorDTO} from "../api/authorsApi.ts";
@@ -29,6 +29,7 @@ export default function BooksPage() {
     const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
     const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
+    const [rating, setRating] = useState<number | "">("");
 
 
     const {
@@ -83,7 +84,46 @@ export default function BooksPage() {
                     onClose={() => setSelectedBookId(null)}
                     sx={{mt: 2}}
             >
-                    <DialogTitle> Dialog dla książki o ID: {selectedBookId} </DialogTitle>
+                    <DialogTitle> Add Review of a book You read! </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>Choose a rating and optionally add a written review.</DialogContentText>
+                        <form
+                            onSubmit={(e) => {console.log("Submitting form for book ID: " , selectedBookId); e.preventDefault(); setSelectedBookId(null); setRating("");}}
+                            id="add-review-form"
+                        >
+                            <InputLabel
+                            id="rating-select-label">Rating</InputLabel>
+                         <Select
+                             required={true}
+                             labelId="rating-select-label"
+                             id="rating-select"
+                             value={rating}
+                             onChange={(e) => setRating(Number(e.target.value))}
+                         >
+                             <MenuItem value={1}>1</MenuItem>
+                             <MenuItem value={2}>2</MenuItem>
+                             <MenuItem value={3}>3</MenuItem>
+                             <MenuItem value={4}>4</MenuItem>
+                             <MenuItem value={5}>5</MenuItem>
+                             <MenuItem value={6}>6</MenuItem>
+                             <MenuItem value={7}>7</MenuItem>
+                             <MenuItem value={8}>8</MenuItem>
+                             <MenuItem value={9}>9</MenuItem>
+                             <MenuItem value={10}>10</MenuItem>
+                         </Select>
+
+                            <TextField
+                                id="review-field"
+                                label="Review"
+                                multiline
+                                rows={4}
+                            >
+
+                            </TextField>
+                        </form>
+                    </DialogContent>
+                    <Button onClick = {() => {setSelectedBookId(null); setRating("");}}>Cancel</Button>
+                    <Button form="add-review-form" type="submit">Submit</Button>
                 </Dialog>
         <Stack spacing={2}>
             <Pagination
