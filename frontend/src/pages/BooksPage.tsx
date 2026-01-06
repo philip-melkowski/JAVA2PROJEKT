@@ -90,7 +90,14 @@ export default function BooksPage() {
                     <DialogContent>
                         <DialogContentText>Choose a rating and optionally add a written review.</DialogContentText>
                         <form
-                            onSubmit={(e) => {console.log("Submitting form for book ID: " , selectedBookId); createReview({ rating: Number(rating), comment, bookId: selectedBookId! }); e.preventDefault(); setSelectedBookId(null); setRating("");}}
+                            onSubmit={ async () => {
+                                await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
+                                resetPage();
+                                retry();
+                                setSelectedBookId(null);
+                                setRating("");
+                                setComment("");
+                            }}
                             id="add-review-form"
                         >
                             <InputLabel
