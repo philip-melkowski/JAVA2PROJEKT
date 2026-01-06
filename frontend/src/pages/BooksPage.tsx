@@ -32,7 +32,8 @@ export default function BooksPage() {
     const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
     const [rating, setRating] = useState<number | "">("");
     const [comment, setComment] = useState<string>("");
-    const [reviewError, setReviewError] = useState<string | null>(null);
+    const [reviewError, setReviewError] = useState<string | null>(null); // ewentualny błąd przy tworzeniu recenzji
+    const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false); // true w trakcie wołania endpointu w backendzie.
 
 
     const {
@@ -96,14 +97,15 @@ export default function BooksPage() {
 
                                 e.preventDefault(); // nie przeładowuje strony
 
+                                setIsSubmittingReview(true);
                                 try{
-                                await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
-                                resetPage();
-                                retry();
-                                setSelectedBookId(null);
-                                setRating("");
-                                setComment("");
-                                setReviewError(null);
+                                        await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
+                                        resetPage();
+                                        retry();
+                                        setSelectedBookId(null);
+                                        setRating("");
+                                        setComment("");
+                                        setReviewError(null);
                             }
 
                             catch (err) {
@@ -113,12 +115,14 @@ export default function BooksPage() {
                                         setReviewError("Unexpected error");
                                     }
                                 }
+                                finally { setIsSubmittingReview(false); }
                         }}
                             id="add-review-form"
                         >
                             <InputLabel
                             id="rating-select-label">Rating</InputLabel>
                          <Select
+                             disabled={isSubmittingReview}
                              required={true}
                              labelId="rating-select-label"
                              id="rating-select"
@@ -138,6 +142,7 @@ export default function BooksPage() {
                          </Select>
 
                             <TextField
+                                disabled={isSubmittingReview}
                                 id="review-field"
                                 label="Review"
                                 multiline
@@ -151,7 +156,9 @@ export default function BooksPage() {
                         </form>
                     </DialogContent>
                     <Button onClick = {() => {setSelectedBookId(null); setRating("");setReviewError(null);}}>Cancel</Button>
-                    <Button form="add-review-form" type="submit">Submit</Button>
+                    <Button
+                        disabled={isSubmittingReview}
+                        form="add-review-form" type="submit">Submit</Button>
                 </Dialog>
         <Stack spacing={2}>
             <Pagination
