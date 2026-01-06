@@ -32,6 +32,7 @@ export default function MyReviewsPage() {
     return <>
         {loading && <Typography variant="h6">Loading...</Typography>}
         {isError && <Typography variant="h6">Error</Typography>}
+        {!isError && !loading && myReviews.length === 0 && <Typography variant="h6">You have not reviewed any books yet!</Typography>}
 
         {myReviews.map( rev =>
             (
