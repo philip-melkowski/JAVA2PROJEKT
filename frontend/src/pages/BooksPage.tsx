@@ -12,6 +12,7 @@ import {BooksListSection} from "../components/BooksListSection.tsx";
 import {useBooks} from "../hooks/useBooks.ts";
 import {useAuthors} from "../hooks/useAuthors.ts";
 
+
 type SortField = "title" | "publishYear" | "genre";
 type Order = "asc" | "desc";
 type Title = string | null;
@@ -27,7 +28,7 @@ export default function BooksPage() {
     const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
     const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
     const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
-
+    const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
 
 
     const {
@@ -60,7 +61,10 @@ export default function BooksPage() {
     }, [titleFilter]);
 
 
-
+    const handleAddReview = (bookId: number) => {
+        setSelectedBookId(bookId);
+        console.log("Review dla ksiazki o ID: ", selectedBookId);
+    }
 
     return (
         <Box
@@ -73,7 +77,7 @@ export default function BooksPage() {
                 </Typography>
                 <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={debounceAuthorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
-            <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList}></BooksListSection>
+            <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList} onAddReview={handleAddReview}></BooksListSection>
         <Stack spacing={2}>
             <Pagination
                 disabled={loading}

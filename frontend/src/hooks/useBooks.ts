@@ -8,6 +8,7 @@ export type GetBooksProps = {
     genre?: string;
     authorId?: number;
     title?: string;
+
 }
 
 
@@ -19,6 +20,8 @@ export function useBooks(props: GetBooksProps) {
     const [totalPages, setTotalPages] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
+
+
 
 
     const fetchBooks = useCallback(async () => {

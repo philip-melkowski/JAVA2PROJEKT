@@ -7,6 +7,7 @@ export type BooksListProps = {
     isError: boolean;
     onRetry: () => void;
     books: BookDTO[];
+    onAddReview: (bookId: number) => void;
 }
 
 export function BooksListSection(props: BooksListProps) {
@@ -33,7 +34,7 @@ export function BooksListSection(props: BooksListProps) {
                 <Button
                 sx={{ width: 80, height: 40, alignSelf: "center" }}
             variant="contained"
-            onClick={() => console.log("ADDED REVIEW for book ID: ", book.id)}
+            onClick={() => props.onAddReview(book.id)}
             ></Button></Stack></Stack>
         ))}
     </Stack> }
