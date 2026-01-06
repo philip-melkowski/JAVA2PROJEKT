@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {
-    Box,
+    Box, Dialog, DialogTitle,
     Pagination,
     Stack,
     Typography,
@@ -78,10 +78,13 @@ export default function BooksPage() {
                 <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={debounceAuthorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
             <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList} onAddReview={handleAddReview}></BooksListSection>
-            {selectedBookId !== null && (
-                <Typography
+                <Dialog
+                    open={selectedBookId !== null}
+                    onClose={() => setSelectedBookId(null)}
                     sx={{mt: 2}}
-            >Dialog dla książki o ID: {selectedBookId}</Typography>)}
+            >
+                    <DialogTitle> Dialog dla książki o ID: {selectedBookId} </DialogTitle>
+                </Dialog>
         <Stack spacing={2}>
             <Pagination
                 disabled={loading}
