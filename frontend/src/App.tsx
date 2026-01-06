@@ -4,6 +4,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import {useAuth} from "./auth/AuthContext.tsx";
 import BooksPage from "./pages/BooksPage.tsx";
+import MyReviewsPage from "./pages/MyReviewsPage.tsx";
 
 
 function App() {
@@ -28,6 +29,11 @@ function App() {
                 </ProtectedRoute>
             }
             />
+          <Route path="/my-reviews" element={
+              <ProtectedRoute>
+                  <MyReviewsPage></MyReviewsPage>
+              </ProtectedRoute>
+          }></Route>
           <Route path="*" element={
               <Navigate to="/login" />
           }
