@@ -122,7 +122,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch (Exception e) {
-            handlerExceptionResolver.resolveException(request, response, null, e);
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+        {"message":"Invalid or expired token"}
+    """);
+            return;
         }
 
     }
