@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.ReviewDTO;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.service.ReviewService;
 
 import java.util.List;
@@ -32,9 +33,12 @@ public class ReviewController {
 
     //dodaj recenzje jesli jeszcze nie istnieje
     @PostMapping()
-    public ResponseEntity<ReviewDTO> saveReview(@Valid @RequestBody ReviewDTO newReview)
+    public ResponseEntity<ReviewDTO> saveReview(@Valid @RequestBody ReviewDTO newReview
+    ,Authentication auth)
     {
-        return ResponseEntity.ok(reviewService.saveReview(newReview));
+        User user = (User) auth.getPrincipal();
+        Long userId = user.getId();
+        return ResponseEntity.ok(reviewService.saveReview(newReview, userId));
     }
 
     // aktualizuje dana recenzje

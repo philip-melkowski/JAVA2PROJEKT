@@ -64,17 +64,17 @@ public class ReviewService {
 
     //  Dodanie nowej recenzji (z kontrolą duplikatów)
     @Transactional
-    public ReviewDTO saveReview(ReviewDTO dto) {
+    public ReviewDTO saveReview(ReviewDTO dto, Long userId) {
 
         // 1️⃣ Pobranie powiązanej książki i użytkownika
         Book book = bookRepository.findById(dto.getBookId())
                 .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
 
-        User user = userRepository.findById(dto.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
 
         // 2️⃣ Sprawdzenie, czy użytkownik już oceniał tę książkę
-        if (reviewRepository.existsByBookIdAndUserId(dto.getBookId(), dto.getUserId())) {
+        if (reviewRepository.existsByBookIdAndUserId(dto.getBookId(), userId)) {
             throw new ReviewAlreadyExistsException("error.review.alreadyexists");
         }
 
