@@ -1,5 +1,6 @@
-import {createContext, useContext, useState, type ReactNode} from 'react';
+import {createContext, useContext, useState, type ReactNode, useEffect} from 'react';
 import {login} from "../api/authApi.ts"
+import {registerUnauthorizedHandler} from "../api/api.ts";
 
 // typy danych w kontekscie
 type AuthContextType = {
@@ -29,6 +30,10 @@ export const AuthProvider = (props: {children: ReactNode}) =>{
         localStorage.removeItem("token");
     }
 
+    useEffect(() => {
+        registerUnauthorizedHandler(logoutUser)
+    }, []);
+
     return (
         <AuthContext.Provider value={{
             token,
@@ -41,7 +46,7 @@ export const AuthProvider = (props: {children: ReactNode}) =>{
 }
 
 // custom hook
-//  żeby zamiast pisac useContext(AuthContext) moć napisac const {login, token} = useAuth();
+//  żeby zamiast pisać useContext(AuthContext) moć napisać const {login, token} = useAuth();
 export const useAuth = () =>
 {
     const context = useContext(AuthContext);

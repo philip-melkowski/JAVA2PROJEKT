@@ -1,5 +1,12 @@
 const BASE_URL = 'http://localhost:8080';
 
+// handler 401
+let onUnauthorized: (() => void) | null = null;
+
+export function registerUnauthorizedHandler(handler: () => void) {
+    onUnauthorized = handler;
+}
+
 type ApiErrorCode =
     | "UNAUTHORIZED"
     | "FORBIDDEN"
@@ -49,6 +56,8 @@ export async function apiFetch(
                 code: "UNAUTHORIZED",
                 message: "Your session has expired. Please log in again.",
             };
+            if(onUnauthorized) onUnauthorized();
+
         } else if (status === 403) {
             error = {
                 code: "FORBIDDEN",
