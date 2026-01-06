@@ -1,4 +1,4 @@
-import {Button, Dialog, Divider, Stack, Typography} from "@mui/material";
+import {Button, Dialog, Stack, Typography} from "@mui/material";
 import {getMyReviews, type ReviewDTO} from "../api/reviewApi.ts";
 import {useEffect, useState} from "react";
 
@@ -70,6 +70,7 @@ export default function MyReviewsPage() {
                         sx = {{width: 80}}
                         variant="h6">{rev.rating}</Typography>
                     <Typography
+                        onClick={() => setSelectedReview(rev)}
                         sx = {{width: 200}}
                         variant="h6">{rev.comment.slice(0, 50) + "..."}</Typography>
                     <Button>Change review</Button>
