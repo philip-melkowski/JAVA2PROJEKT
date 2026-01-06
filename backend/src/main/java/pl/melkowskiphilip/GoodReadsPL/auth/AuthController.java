@@ -3,11 +3,11 @@ package pl.melkowskiphilip.GoodReadsPL.auth;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.*;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -15,6 +15,8 @@ import pl.melkowskiphilip.GoodReadsPL.dto.*;
 public class AuthController {
 
     private final AuthService authService;
+
+
 
     // logowanie
     @PostMapping("/login")
@@ -35,5 +37,13 @@ public class AuthController {
     @PostMapping("/resendActivationMail")
     public ResponseEntity<String> resendActivationMail(@Valid @RequestBody ResendActivationDTO mail) {
         return ResponseEntity.ok(authService.resendActivationMail(mail.getEmail()));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<String> getMe(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(user.getUsername());
+
+
     }
 }
