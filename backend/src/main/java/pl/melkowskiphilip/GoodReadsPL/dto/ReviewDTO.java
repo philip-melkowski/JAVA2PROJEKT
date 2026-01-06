@@ -25,7 +25,7 @@ public class ReviewDTO {
     @NotNull
     private Long bookId;
 
-    @NotNull
+
     private Long userId;
 
     // te pola bez @NotBlank, bo przy tworzeniu recenzji np. będą podawane tylko pola - userId, bookId
