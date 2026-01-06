@@ -32,6 +32,7 @@ export default function BooksPage() {
     const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
     const [rating, setRating] = useState<number | "">("");
     const [comment, setComment] = useState<string>("");
+    const [reviewError, setReviewError] = useState<string | null>(null);
 
 
     const {
@@ -89,15 +90,30 @@ export default function BooksPage() {
                     <DialogTitle> Add Review of a book You read! </DialogTitle>
                     <DialogContent>
                         <DialogContentText>Choose a rating and optionally add a written review.</DialogContentText>
+                        <Typography color="error">{reviewError}</Typography>
                         <form
-                            onSubmit={ async () => {
+                            onSubmit={ async (e) => {
+
+                                e.preventDefault(); // nie przeładowuje strony
+
+                                try{
                                 await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
                                 resetPage();
                                 retry();
                                 setSelectedBookId(null);
                                 setRating("");
                                 setComment("");
-                            }}
+                                setReviewError(null);
+                            }
+
+                            catch (err) {
+                                    if (err instanceof Error) {
+                                        setReviewError(err.message);
+                                    } else {
+                                        setReviewError("Unexpected error");
+                                    }
+                                }
+                        }}
                             id="add-review-form"
                         >
                             <InputLabel
@@ -134,7 +150,7 @@ export default function BooksPage() {
                             </TextField>
                         </form>
                     </DialogContent>
-                    <Button onClick = {() => {setSelectedBookId(null); setRating("");}}>Cancel</Button>
+                    <Button onClick = {() => {setSelectedBookId(null); setRating("");setReviewError(null);}}>Cancel</Button>
                     <Button form="add-review-form" type="submit">Submit</Button>
                 </Dialog>
         <Stack spacing={2}>
