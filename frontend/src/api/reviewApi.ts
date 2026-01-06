@@ -21,3 +21,8 @@ export function createReview(params: CreateReviewRequest) : Promise<ReviewDTO>
     return apiFetch("api/reviews", {method: "POST",
         body: JSON.stringify(params)});
 }
+
+export function getMyReviews() : Promise<ReviewDTO[]>
+{
+    return apiFetch("api/reviews/me");
+}
