@@ -6,6 +6,10 @@ export type ReviewDTO = {
     comment: string;
     bookId: number;
     userId: number;
+    bookTitle?: string;
+    authorName?: string;
+    authorSurname?: string;
+
 }
 
 export type CreateReviewRequest = {

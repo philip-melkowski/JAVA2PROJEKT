@@ -30,12 +30,17 @@ export default function MyReviewsPage() {
     }, []);
 
     return <>
+        {loading && <Typography variant="h6">Loading...</Typography>}
+        {isError && <Typography variant="h6">Error</Typography>}
+
         {myReviews.map( rev =>
             (
                 <Stack
                     direction="row"
                     key={rev.id}
-                >   <Typography variant="h6">{rev.bookId}</Typography>
+                    >
+                    <Typography variant="h6">{rev.authorSurname}</Typography>
+                    <Typography variant="h6">{rev.bookTitle}</Typography>
                     <Button>Change review</Button>
                     <Button>Delete review</Button>
                 </Stack>
