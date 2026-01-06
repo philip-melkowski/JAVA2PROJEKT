@@ -45,10 +45,8 @@ public class ReviewService {
 
     //  Recenzje konkretnego użytkownika
     public List<ReviewDTO> findAllByCurrentUser(Authentication auth) {
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        User user = (User) auth.getPrincipal();
 
-        User user = userRepository.findByUsernameIgnoreCase(userDetails.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("error.user.notfound"));
         return reviewRepository.findAllByUserId(user.getId())
                 .stream()
                 .map(this::toDTO)
