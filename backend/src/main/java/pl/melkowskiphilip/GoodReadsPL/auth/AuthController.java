@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.*;
 import pl.melkowskiphilip.GoodReadsPL.entity.User;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,9 +42,9 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<String> getMe(Authentication auth) {
+    public ResponseEntity<Map<String, String>> getMe(Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return ResponseEntity.ok(user.getUsername());
+        return ResponseEntity.ok(Map.of("username", user.getUsername()));
 
 
     }
