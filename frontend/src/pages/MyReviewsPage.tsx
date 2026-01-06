@@ -11,8 +11,22 @@ export default function MyReviewsPage() {
 
 
     useEffect(() => {
-        const reviews = getMyReviews();
-        setMyReviews(reviews);
+        const fetchReviews = async () => {
+            try {
+                setLoading(true);
+                const reviews = await getMyReviews();
+                setMyReviews(reviews);
+                setIsError(false);
+            }
+            catch
+            {
+                setIsError(true);
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        fetchReviews();
     }, []);
 
     return <>
