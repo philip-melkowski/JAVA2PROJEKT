@@ -11,12 +11,13 @@ export type ReviewDTO = {
 export type CreateReviewRequest = {
 
     rating: number;
-    comment?: string;
+    comment: string | null;
     bookId: number;
 
 }
 
 export function createReview(params: CreateReviewRequest) : Promise<ReviewDTO>
 {
-    return apiFetch("api/reviews", {method: "POST", body: JSON.stringify(params)});
+    return apiFetch("api/reviews", {method: "POST",
+        body: JSON.stringify(params)});
 }
