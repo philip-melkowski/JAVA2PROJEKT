@@ -11,6 +11,7 @@ import {BooksFiltersBar} from "../components/BooksFiltersBar.tsx";
 import {BooksListSection} from "../components/BooksListSection.tsx";
 import {useBooks} from "../hooks/useBooks.ts";
 import {useAuthors} from "../hooks/useAuthors.ts";
+import {createReview} from "../api/reviewApi.ts";
 
 
 type SortField = "title" | "publishYear" | "genre";
@@ -30,6 +31,7 @@ export default function BooksPage() {
     const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
     const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
     const [rating, setRating] = useState<number | "">("");
+    const [comment, setComment] = useState<string>("");
 
 
     const {
@@ -88,7 +90,7 @@ export default function BooksPage() {
                     <DialogContent>
                         <DialogContentText>Choose a rating and optionally add a written review.</DialogContentText>
                         <form
-                            onSubmit={(e) => {console.log("Submitting form for book ID: " , selectedBookId); e.preventDefault(); setSelectedBookId(null); setRating("");}}
+                            onSubmit={(e) => {console.log("Submitting form for book ID: " , selectedBookId); createReview({ rating: Number(rating), comment, bookId: selectedBookId! }); e.preventDefault(); setSelectedBookId(null); setRating("");}}
                             id="add-review-form"
                         >
                             <InputLabel
@@ -117,6 +119,9 @@ export default function BooksPage() {
                                 label="Review"
                                 multiline
                                 rows={4}
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+
                             >
 
                             </TextField>
