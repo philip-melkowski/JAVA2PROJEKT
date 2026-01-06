@@ -1,4 +1,4 @@
-import {Typography} from "@mui/material";
+import {Button, Stack, Typography} from "@mui/material";
 import {getMyReviews, type ReviewDTO} from "../api/reviewApi.ts";
 import {useEffect, useState} from "react";
 
@@ -11,11 +11,22 @@ export default function MyReviewsPage() {
 
 
     useEffect(() => {
-        getMyReviews()
+        const reviews = getMyReviews();
+        setMyReviews(reviews);
     }, []);
 
     return <>
-      <Typography>hello</Typography>
+        {myReviews.map( rev =>
+            (
+                <Stack
+                    direction="row"
+                    key={rev.id}
+                >   <Typography variant="h6">{rev.bookId}</Typography>
+                    <Button>Change review</Button>
+                    <Button>Delete review</Button>
+                </Stack>
+            )
+        )}
 
     </>;
 

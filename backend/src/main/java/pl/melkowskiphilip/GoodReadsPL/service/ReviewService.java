@@ -46,8 +46,9 @@ public class ReviewService {
     //  Recenzje konkretnego użytkownika
     public List<ReviewDTO> findAllByCurrentUser(Authentication auth) {
         User user = (User) auth.getPrincipal();
+        Long userId = user.getId();
 
-        return reviewRepository.findAllByUserId(user.getId())
+        return reviewRepository.findAllByUserId(userId)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());

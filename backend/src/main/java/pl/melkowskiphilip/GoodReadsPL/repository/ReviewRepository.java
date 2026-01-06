@@ -19,7 +19,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     join fetch b.author
     where r.user.id = :userId
     """)
-    List<Review> findAllByUserId(Long id);
+    List<Review> findAllByUserId(Long userId);
 
     @Query("""
     select r.book.id from Review r
