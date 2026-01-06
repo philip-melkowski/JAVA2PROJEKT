@@ -63,7 +63,7 @@ export default function BooksPage() {
 
     const handleAddReview = (bookId: number) => {
         setSelectedBookId(bookId);
-        console.log("Review dla ksiazki o ID: ", selectedBookId);
+        console.log("Review dla ksiazki o ID: ", bookId);
     }
 
     return (
@@ -78,6 +78,10 @@ export default function BooksPage() {
                 <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={debounceAuthorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
             </Stack>
             <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList} onAddReview={handleAddReview}></BooksListSection>
+            {selectedBookId !== null && (
+                <Typography
+                    sx={{mt: 2}}
+            >Dialog dla książki o ID: {selectedBookId}</Typography>)}
         <Stack spacing={2}>
             <Pagination
                 disabled={loading}
