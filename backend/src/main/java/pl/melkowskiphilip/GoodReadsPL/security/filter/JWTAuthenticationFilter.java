@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.melkowskiphilip.GoodReadsPL.security.JWT.JWTService;
@@ -49,7 +50,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // brak tokena → puszczamy dalej (SecurityConfig zdecyduje)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -69,7 +69,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         userDetailsService.loadUserByUsername(username);
 
                 if (!jwtService.isTokenValid(jwt, userDetails)) {
-                    throw new BadCredentialsException("Invalid or expired token");
+                    throw new BadCredentialsException("Invalid token");
                 }
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -80,25 +80,33 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         );
 
                 authToken.setDetails(
-                        new org.springframework.security.web.authentication
-                                .WebAuthenticationDetailsSource()
-                                .buildDetails(request)
+                        new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {"message":"Token expired"}
+        """);
+            return;
 
         } catch (BadCredentialsException e) {
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("""
-                {"message":"Invalid or expired token"}
-            """);
+            {"message":"Invalid token"}
+        """);
             return;
         }
 
-        // ⬅⬅⬅ NAJWAŻNIEJSZE: POZA try/catch
+        // ⬇⬇⬇ TERAZ print ZAWSZE się wykona dla poprawnego tokena
+        System.out.println("JWT FILTER PASSED: " + request.getRequestURI());
         filterChain.doFilter(request, response);
     }
 }

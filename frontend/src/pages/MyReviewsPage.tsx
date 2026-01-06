@@ -1,4 +1,4 @@
-import {Button, Stack, Typography} from "@mui/material";
+import {Button, Dialog, Divider, Stack, Typography} from "@mui/material";
 import {getMyReviews, type ReviewDTO} from "../api/reviewApi.ts";
 import {useEffect, useState} from "react";
 
@@ -8,6 +8,7 @@ export default function MyReviewsPage() {
     const [myReviews, setMyReviews] = useState<ReviewDTO[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
+    const [selectedReview, setSelectedReview] = useState<ReviewDTO | null>(null);
 
 
     useEffect(() => {
@@ -34,14 +35,43 @@ export default function MyReviewsPage() {
         {isError && <Typography variant="h6">Error</Typography>}
         {!isError && !loading && myReviews.length === 0 && <Typography variant="h6">You have not reviewed any books yet!</Typography>}
 
+        <Stack
+        direction="row">
+            <Typography
+                sx = {{width: 160}}
+                variant="h6">Author</Typography>
+            <Typography
+                sx = {{width: 360}}
+                variant="h6">Title</Typography>
+            <Typography
+                sx = {{width: 80}}
+                variant="h6">Rating</Typography>
+            <Typography
+                sx = {{width: 200}}
+                variant="h6">Review</Typography>
+        </Stack>
         {myReviews.map( rev =>
             (
                 <Stack
                     direction="row"
                     key={rev.id}
                     >
-                    <Typography variant="h6">{rev.authorSurname}</Typography>
-                    <Typography variant="h6">{rev.bookTitle}</Typography>
+                    <Dialog
+                        open={selectedReview !== null}
+                        onClose={() => setSelectedReview(null)}
+                    ><Typography>{selectedReview?.comment}</Typography></Dialog>
+                    <Typography
+                        sx = {{width: 160}}
+                        variant="h6">{rev.authorSurname}</Typography>
+                    <Typography
+                        sx = {{width: 360}}
+                        variant="h6">{rev.bookTitle}</Typography>
+                    <Typography
+                        sx = {{width: 80}}
+                        variant="h6">{rev.rating}</Typography>
+                    <Typography
+                        sx = {{width: 200}}
+                        variant="h6">{rev.comment.slice(0, 50) + "..."}</Typography>
                     <Button>Change review</Button>
                     <Button>Delete review</Button>
                 </Stack>

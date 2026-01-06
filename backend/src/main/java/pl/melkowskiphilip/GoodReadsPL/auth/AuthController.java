@@ -4,9 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pl.melkowskiphilip.GoodReadsPL.dto.*;
-import pl.melkowskiphilip.GoodReadsPL.entity.User;
+
 
 import java.util.Map;
 
@@ -43,8 +44,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<Map<String, String>> getMe(Authentication auth) {
-        User user = (User) auth.getPrincipal();
-        return ResponseEntity.ok(Map.of("username", user.getUsername()));
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        return ResponseEntity.ok(Map.of("username", userDetails.getUsername()));
 
 
     }
