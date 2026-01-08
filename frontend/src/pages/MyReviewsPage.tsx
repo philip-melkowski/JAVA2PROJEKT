@@ -10,6 +10,8 @@ export default function MyReviewsPage() {
     const [isError, setIsError] = useState<boolean>(false);
     const [selectedReview, setSelectedReview] = useState<ReviewDTO | null>(null);
 
+    const COMMENT_PREVIEW_LENGTH = 15; // długość tekstu recenzji widocznego w tabeli
+
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -52,6 +54,7 @@ export default function MyReviewsPage() {
         </Stack>
         {myReviews.map( rev =>
             (
+
                 <Stack
                     direction="row"
                     key={rev.id}
@@ -76,7 +79,7 @@ export default function MyReviewsPage() {
                                , cursor: "pointer"
                                 , "&:hover": {color: "primary.main"}
                     }}
-                        variant="h6">{rev.comment.slice(0, 50) + "..."}</Typography>
+                        variant="h6">{rev.comment.length-1 > COMMENT_PREVIEW_LENGTH ? rev.comment.slice(0, COMMENT_PREVIEW_LENGTH) + "..." : rev.comment}</Typography>
                     <Button>Change review</Button>
                     <Button>Delete review</Button>
                 </Stack>
