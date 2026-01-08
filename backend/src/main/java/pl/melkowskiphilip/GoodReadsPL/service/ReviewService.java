@@ -123,10 +123,12 @@ public class ReviewService {
 
     //  Usunięcie recenzji
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Long id, Long userId) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("error.review.notfound"));
-
+        if( !(review.getUser().getId().equals(userId)) ) {
+            throw new BadCredentialsException("error.review.invalid.credentials");
+        }
         User user = review.getUser();
         Book book = review.getBook();
 

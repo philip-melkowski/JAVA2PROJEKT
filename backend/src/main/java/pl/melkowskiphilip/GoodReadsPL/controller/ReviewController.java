@@ -52,7 +52,10 @@ public class ReviewController {
 
     // usuwa dana recenzje
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) { reviewService.deleteById(id); return ResponseEntity.noContent().build(); }
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        Long userId = user.getId();
+        reviewService.deleteById(id, userId); return ResponseEntity.noContent().build(); }
 
     // recenzje z komentarzem dla danej ksiazki
     @GetMapping("/comments/{bookId}")
