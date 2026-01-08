@@ -1,5 +1,6 @@
 package pl.melkowskiphilip.GoodReadsPL.security.filter;
 
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -95,6 +96,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         """);
             return;
 
+        } catch (MalformedJwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {"message":"Invalid token format"}
+        """);
+            return;
         } catch (BadCredentialsException e) {
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
