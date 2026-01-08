@@ -23,7 +23,7 @@ export type CreateReviewRequest = {
 export type UpdateReviewRequest = {
     rating: number;
     comment: string | null;
-    reviewId: number;
+    bookId: number;
 }
 
 export function createReview(params: CreateReviewRequest) : Promise<ReviewDTO>
@@ -37,8 +37,8 @@ export function getMyReviews() : Promise<ReviewDTO[]>
     return apiFetch("api/reviews/me");
 }
 
-export function updateReview(params: UpdateReviewRequest) : Promise<ReviewDTO>
+export function updateReview(params: UpdateReviewRequest, reviewId: number) : Promise<ReviewDTO>
 {
-    return apiFetch(`api/reviews`, {method: "PUT",
+    return apiFetch(`api/reviews/${reviewId}`, {method: "PUT",
         body: JSON.stringify(params)});
 }
