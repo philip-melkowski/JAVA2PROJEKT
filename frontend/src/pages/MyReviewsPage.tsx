@@ -21,9 +21,9 @@ export default function MyReviewsPage() {
     const [isError, setIsError] = useState<boolean>(false);
     const [selectedReview, setSelectedReview] = useState<ReviewDTO | null>(null);
 
-    const COMMENT_PREVIEW_LENGTH = 15; // długość tekstu recenzji widocznego w tabeli
+    const COMMENT_PREVIEW_LENGTH = 15;
+    const MAX_COMMENT_LENGTH = 2000;
 
-    // stany do edit review
     const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
     const [editedReviewId, setEditedReviewId] = useState<number | null>(null);
     const [editedRating, setEditedRating] = useState<number | null>(null);
@@ -31,11 +31,12 @@ export default function MyReviewsPage() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [editedBookId, setEditedBookId] = useState<number | null>(null);
 
-    // stan do refetch
     const [shouldRefetch, setShouldRefetch] = useState<boolean>(true);
-
-    // błąd podczas edycji recenzji
     const [errorEditing, setErrorEditing] = useState<string | null>(null);
+
+    const commentLength = editedComment?.length ?? 0;
+    const isCommentTooLong = commentLength > MAX_COMMENT_LENGTH;
+    const isRatingMissing = editedRating === null;
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -68,27 +69,29 @@ export default function MyReviewsPage() {
             </Stack>
 
             {myReviews.map(rev => (
-                <Stack
-                    direction="row"
-                    alignItems="center"
-                    key={rev.id}
-                >
+                <Stack direction="row" alignItems="center" key={rev.id}>
+
                     <Dialog
                         open={selectedReview !== null}
                         onClose={() => setSelectedReview(null)}
                     >
-                        <Typography>{selectedReview?.comment}</Typography>
+                        <DialogContent>
+                            <Typography>{selectedReview?.comment}</Typography>
+                        </DialogContent>
                     </Dialog>
 
                     <Typography sx={{width: 160, flexShrink: 0}} variant="h6">
                         {rev.authorSurname}
                     </Typography>
+
                     <Typography sx={{width: 360, flexShrink: 0}} variant="h6">
                         {rev.bookTitle}
                     </Typography>
+
                     <Typography sx={{width: 80, flexShrink: 0}} variant="h6">
                         {rev.rating}
                     </Typography>
+
                     <Typography
                         onClick={() => setSelectedReview(rev)}
                         sx={{
@@ -117,6 +120,7 @@ export default function MyReviewsPage() {
                     >
                         Edit review
                     </Button>
+
                     <Button>Delete review</Button>
                 </Stack>
             ))}
@@ -138,7 +142,6 @@ export default function MyReviewsPage() {
                     <InputLabel id="rating-select-label">Rating</InputLabel>
                     <Select
                         disabled={isSubmitting}
-                        required={true}
                         labelId="rating-select-label"
                         value={editedRating ?? ""}
                         onChange={(e) => setEditedRating(Number(e.target.value))}
@@ -148,6 +151,12 @@ export default function MyReviewsPage() {
                             <MenuItem key={v} value={v}>{v}</MenuItem>
                         )}
                     </Select>
+
+                    {isRatingMissing && (
+                        <Typography color="error">
+                            Rating is required
+                        </Typography>
+                    )}
 
                     <TextField
                         label="Review"
@@ -159,6 +168,19 @@ export default function MyReviewsPage() {
                         margin="normal"
                     />
 
+                    <Typography
+                        variant="body2"
+                        color={isCommentTooLong ? "error" : "text.secondary"}
+                    >
+                        {commentLength} / {MAX_COMMENT_LENGTH}
+                    </Typography>
+
+                    {isCommentTooLong && (
+                        <Typography color="error">
+                            Comment is too long
+                        </Typography>
+                    )}
+
                     {errorEditing && (
                         <Typography color="error">{errorEditing}</Typography>
                     )}
@@ -169,8 +191,9 @@ export default function MyReviewsPage() {
                         disabled={
                             isSubmitting ||
                             editedReviewId === null ||
-                            editedRating === null ||
-                            editedBookId === null
+                            editedBookId === null ||
+                            isRatingMissing ||
+                            isCommentTooLong
                         }
                         onClick={async () => {
                             if (
