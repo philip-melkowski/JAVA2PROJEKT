@@ -40,16 +40,16 @@ export default function MyReviewsPage() {
         <Stack
         direction="row">
             <Typography
-                sx = {{width: 160}}
+                sx = {{width: 160, flexShrink: 0}}
                 variant="h6">Author</Typography>
             <Typography
-                sx = {{width: 360}}
+                sx = {{width: 360, flexShrink: 0}}
                 variant="h6">Title</Typography>
             <Typography
-                sx = {{width: 80}}
+                sx = {{width: 80, flexShrink: 0}}
                 variant="h6">Rating</Typography>
             <Typography
-                sx = {{width: 200}}
+                sx = {{width: 200, flexShrink: 0}}
                 variant="h6">Review</Typography>
         </Stack>
         {myReviews.map( rev =>
@@ -57,6 +57,7 @@ export default function MyReviewsPage() {
 
                 <Stack
                     direction="row"
+                    alignItems="center"
                     key={rev.id}
                     >
                     <Dialog
@@ -64,18 +65,18 @@ export default function MyReviewsPage() {
                         onClose={() => setSelectedReview(null)}
                     ><Typography>{selectedReview?.comment}</Typography></Dialog>
                     <Typography
-                        sx = {{width: 160}}
+                        sx = {{width: 160, flexShrink: 0}}
                         variant="h6">{rev.authorSurname}</Typography>
                     <Typography
-                        sx = {{width: 360}}
+                        sx = {{width: 360, flexShrink: 0}}
                         variant="h6">{rev.bookTitle}</Typography>
                     <Typography
-                        sx = {{width: 80}}
+                        sx = {{width: 80, flexShrink: 0}}
                         variant="h6">{rev.rating}</Typography>
                     <Typography
 
                         onClick={() => setSelectedReview(rev)}
-                        sx = {{width: 200
+                        sx = {{width: 200, flexShrink: 0
                                , cursor: "pointer"
                                 , "&:hover": {color: "primary.main"}
                     }}
