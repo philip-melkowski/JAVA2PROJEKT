@@ -42,10 +42,12 @@ public class ReviewController {
     }
 
     // aktualizuje dana recenzje
-    @PutMapping()
-    public ResponseEntity<ReviewDTO> updateReview(@Valid @RequestBody ReviewDTO updatedReview)
+    @PutMapping("/{id}")
+    public ResponseEntity<ReviewDTO> updateReview(@Valid @RequestBody ReviewDTO updatedReview, @PathVariable Long id, Authentication auth)
     {
-        return ResponseEntity.ok(reviewService.updateReview(updatedReview));
+        User user = (User) auth.getPrincipal();
+        Long userId = user.getId();
+        return ResponseEntity.ok(reviewService.updateReview(updatedReview, id, userId));
     }
 
     // usuwa dana recenzje

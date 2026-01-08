@@ -1,6 +1,7 @@
 package pl.melkowskiphilip.GoodReadsPL.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,12 +103,18 @@ public class ReviewService {
 
     //  Aktualizacja istniejącej recenzji
     @Transactional
-    public ReviewDTO updateReview(ReviewDTO review) {
-        if (review.getId() == null) {
+    public ReviewDTO updateReview(ReviewDTO review, Long id, Long userId) {
+        if (id == null) {
             throw new InvalidReviewIdException("error.review.invalid.id");
         }
-        Review existingReview = reviewRepository.findById(review.getId())
+
+        Review existingReview = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("error.review.notfound"));
+
+        ReviewDTO existingReviewDTO = toDTO(existingReview);
+        if (!existingReviewDTO.getUserId().equals(userId)) {
+            throw new BadCredentialsException("error.review.invalid.credentials");
+        }
         existingReview.setRating(review.getRating());
         existingReview.setComment(review.getComment());
 

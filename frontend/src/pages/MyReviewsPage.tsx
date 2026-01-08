@@ -81,7 +81,7 @@ export default function MyReviewsPage() {
                                 , "&:hover": {color: "primary.main"}
                     }}
                         variant="h6">{rev.comment.length-1 > COMMENT_PREVIEW_LENGTH ? rev.comment.slice(0, COMMENT_PREVIEW_LENGTH) + "..." : rev.comment}</Typography>
-                    <Button>Change review</Button>
+                    <Button>Edit review</Button>
                     <Button>Delete review</Button>
                 </Stack>
             )
