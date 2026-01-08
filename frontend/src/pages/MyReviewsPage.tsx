@@ -70,8 +70,12 @@ export default function MyReviewsPage() {
                         sx = {{width: 80}}
                         variant="h6">{rev.rating}</Typography>
                     <Typography
+
                         onClick={() => setSelectedReview(rev)}
-                        sx = {{width: 200}}
+                        sx = {{width: 200
+                               , cursor: "pointer"
+                                , "&:hover": {color: "primary.main"}
+                    }}
                         variant="h6">{rev.comment.slice(0, 50) + "..."}</Typography>
                     <Button>Change review</Button>
                     <Button>Delete review</Button>
