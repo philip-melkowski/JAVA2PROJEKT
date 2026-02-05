@@ -43,7 +43,7 @@ export function updateReview(params: UpdateReviewRequest, reviewId: number) : Pr
         body: JSON.stringify(params)});
 }
 
-export function deleteReview(reviewId: number) : Promise<void>
+export function deleteReview(reviewId: number) : Promise<null>
 {
     return apiFetch(`api/reviews/${reviewId}`, {method: "DELETE"});
 }

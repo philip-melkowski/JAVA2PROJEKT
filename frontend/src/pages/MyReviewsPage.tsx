@@ -31,6 +31,12 @@ export default function MyReviewsPage() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [editedBookId, setEditedBookId] = useState<number | null>(null);
 
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+    const [reviewIdToDelete, setReviewIdToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+    
+
     const [shouldRefetch, setShouldRefetch] = useState<boolean>(true);
     const [errorEditing, setErrorEditing] = useState<string | null>(null);
 
