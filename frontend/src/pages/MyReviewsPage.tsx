@@ -35,10 +35,12 @@ export default function MyReviewsPage() {
     const [reviewIdToDelete, setReviewIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+
     
 
     const [shouldRefetch, setShouldRefetch] = useState<boolean>(true);
     const [errorEditing, setErrorEditing] = useState<string | null>(null);
+    const [errorDeleting, setErrorDeleting] = useState<string | null>(null);
 
     const commentLength = editedComment?.length ?? 0;
     const isCommentTooLong = commentLength > MAX_COMMENT_LENGTH;
@@ -127,7 +129,16 @@ export default function MyReviewsPage() {
                         Edit review
                     </Button>
 
-                    <Button>Delete review</Button>
+                    <Button
+                        disabled={isDeleting}
+                        onClick={() => {
+                            setIsDeleteDialogOpen(true);
+                            setReviewIdToDelete(rev.id);
+                            setErrorDeleting(null);
+                        }}
+                    >
+                        Delete review
+                    </Button>
                 </Stack>
             ))}
 
