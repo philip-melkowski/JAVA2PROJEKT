@@ -11,7 +11,7 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import {getMyReviews, type ReviewDTO, updateReview} from "../api/reviewApi.ts";
+import {getMyReviews, type ReviewDTO, updateReview, deleteReview} from "../api/reviewApi.ts";
 import {useEffect, useState} from "react";
 
 export default function MyReviewsPage() {
@@ -79,14 +79,7 @@ export default function MyReviewsPage() {
             {myReviews.map(rev => (
                 <Stack direction="row" alignItems="center" key={rev.id}>
 
-                    <Dialog
-                        open={selectedReview !== null}
-                        onClose={() => setSelectedReview(null)}
-                    >
-                        <DialogContent>
-                            <Typography>{selectedReview?.comment}</Typography>
-                        </DialogContent>
-                    </Dialog>
+
 
                     <Typography sx={{width: 160, flexShrink: 0}} variant="h6">
                         {rev.authorSurname}
@@ -116,7 +109,7 @@ export default function MyReviewsPage() {
                     </Typography>
 
                     <Button
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isDeleting}
                         onClick={() => {
                             setIsEditDialogOpen(true);
                             setEditedReviewId(rev.id);
@@ -130,7 +123,7 @@ export default function MyReviewsPage() {
                     </Button>
 
                     <Button
-                        disabled={isDeleting}
+                        disabled={isDeleting || isSubmitting}
                         onClick={() => {
                             setIsDeleteDialogOpen(true);
                             setReviewIdToDelete(rev.id);
@@ -141,6 +134,16 @@ export default function MyReviewsPage() {
                     </Button>
                 </Stack>
             ))}
+
+
+        <Dialog
+            open={selectedReview !== null}
+            onClose={() => setSelectedReview(null)}
+        >
+            <DialogContent>
+                <Typography>{selectedReview?.comment}</Typography>
+            </DialogContent>
+        </Dialog>
 
             <Dialog
                 open={isEditDialogOpen}
@@ -158,7 +161,7 @@ export default function MyReviewsPage() {
                 <DialogContent>
                     <InputLabel id="rating-select-label">Rating</InputLabel>
                     <Select
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isDeleting}
                         labelId="rating-select-label"
                         value={editedRating ?? ""}
                         onChange={(e) => setEditedRating(Number(e.target.value))}
@@ -249,7 +252,7 @@ export default function MyReviewsPage() {
                     </Button>
 
                     <Button
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isDeleting}
                         onClick={() => {
                             setIsEditDialogOpen(false);
                             setEditedReviewId(null);
@@ -260,6 +263,64 @@ export default function MyReviewsPage() {
                         }}
                     >
                         Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={isDeleteDialogOpen}
+                onClose={() =>
+                {
+                    if (isDeleting) return;
+                    setIsDeleteDialogOpen(false);
+                    setReviewIdToDelete(null);
+                    setErrorDeleting(null);
+                }}
+            >
+                <DialogTitle>Delete review</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure you want to delete this review?
+                    </Typography>
+                    {errorDeleting && (
+                        <Typography color="error" sx={{mt: 1}}>
+                            {errorDeleting}
+                        </Typography>
+                    )}
+                    </DialogContent>
+                <DialogActions>
+                    <Button
+                        disabled={isDeleting || isSubmitting}
+                        onClick={() =>
+                    {
+                        setIsDeleteDialogOpen(false);
+                        setReviewIdToDelete(null);
+                        setErrorDeleting(null);
+                    }}
+                    >Cancel</Button>
+                    <Button
+                    disabled={isDeleting || isSubmitting || reviewIdToDelete === null}
+                    onClick={async () => {
+                        if(reviewIdToDelete === null) return;
+                        setIsDeleting(true);
+                        try {
+                            await deleteReview(reviewIdToDelete);
+                            setShouldRefetch(prev => !prev);
+                            setIsDeleteDialogOpen(false);
+                            setReviewIdToDelete(null);
+                            setErrorDeleting(null);
+                        } catch (err) {
+                            if (err instanceof Error) {
+                                setErrorDeleting(err.message);
+                            }
+                            else {
+                                setErrorDeleting("Unexpected error");
+                            }
+                        }
+                        finally {
+                            setIsDeleting(false);
+                        }
+                    }}>
+                        {isDeleting ? "Deleting..." : "Delete review"}
                     </Button>
                 </DialogActions>
             </Dialog>
