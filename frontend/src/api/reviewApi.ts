@@ -42,3 +42,8 @@ export function updateReview(params: UpdateReviewRequest, reviewId: number) : Pr
     return apiFetch(`api/reviews/${reviewId}`, {method: "PUT",
         body: JSON.stringify(params)});
 }
+
+export function deleteReview(reviewId: number) : Promise<void>
+{
+    return apiFetch(`api/reviews/${reviewId}`, {method: "DELETE"});
+}
