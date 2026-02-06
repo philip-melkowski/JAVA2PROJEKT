@@ -65,9 +65,10 @@
     export type CreateBookRequest = {
         title: string;
         genre: string;
-        publishYear: number;
+        publishYear: string;
         authorId: number;
     };
+
 
     export type UpdateBookRequest = CreateBookRequest;
 

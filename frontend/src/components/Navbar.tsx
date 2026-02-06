@@ -14,7 +14,7 @@ export default function Navbar() {
                     <NavButton to="/my-reviews" label="My reviews" />
 
                     {role === "ADMIN" && (
-                        <NavButton to="/admin/books" label="Manage books" />
+                        <NavButton to="/admin/manageBooks" label="Manage books" />
                     )}
 
                     <Button color="error" onClick={logout}>
