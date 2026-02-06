@@ -9,10 +9,15 @@ import {
     Select,
     Stack,
     TextField,
-    Typography
+    Typography,
+    Container,
+    Box,
+    CircularProgress,
+    FormControl,
 } from "@mui/material";
 import {getMyReviews, type ReviewDTO, updateReview, deleteReview} from "../api/reviewApi.ts";
 import {useEffect, useState} from "react";
+import ReviewCard from "../components/ReviewCard.tsx";
 
 export default function MyReviewsPage() {
 
@@ -21,7 +26,6 @@ export default function MyReviewsPage() {
     const [isError, setIsError] = useState<boolean>(false);
     const [selectedReview, setSelectedReview] = useState<ReviewDTO | null>(null);
 
-    const COMMENT_PREVIEW_LENGTH = 15;
     const MAX_COMMENT_LENGTH = 2000;
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
@@ -34,9 +38,6 @@ export default function MyReviewsPage() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
     const [reviewIdToDelete, setReviewIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
-
-
-    
 
     const [shouldRefetch, setShouldRefetch] = useState<boolean>(true);
     const [errorEditing, setErrorEditing] = useState<string | null>(null);
@@ -62,267 +63,388 @@ export default function MyReviewsPage() {
         fetchReviews();
     }, [shouldRefetch]);
 
-    return <>
-        {loading && <Typography variant="h6">Loading...</Typography>}
-        {isError && <Typography variant="h6">Error</Typography>}
-        {!isError && !loading && myReviews.length === 0 &&
-            <Typography variant="h6">You have not reviewed any books yet!</Typography>
-        }
-
-            <Stack direction="row">
-                <Typography sx={{width: 160, flexShrink: 0}} variant="h6">Author</Typography>
-                <Typography sx={{width: 360, flexShrink: 0}} variant="h6">Title</Typography>
-                <Typography sx={{width: 80, flexShrink: 0}} variant="h6">Rating</Typography>
-                <Typography sx={{width: 200, flexShrink: 0}} variant="h6">Review</Typography>
-            </Stack>
-
-            {myReviews.map(rev => (
-                <Stack direction="row" alignItems="center" key={rev.id}>
-
-
-
-                    <Typography sx={{width: 160, flexShrink: 0}} variant="h6">
-                        {rev.authorSurname}
-                    </Typography>
-
-                    <Typography sx={{width: 360, flexShrink: 0}} variant="h6">
-                        {rev.bookTitle}
-                    </Typography>
-
-                    <Typography sx={{width: 80, flexShrink: 0}} variant="h6">
-                        {rev.rating}
-                    </Typography>
-
-                    <Typography
-                        onClick={() => setSelectedReview(rev)}
-                        sx={{
-                            width: 200,
-                            flexShrink: 0,
-                            cursor: "pointer",
-                            "&:hover": {color: "primary.main"}
-                        }}
-                        variant="h6"
-                    >
-                        {rev.comment.length > COMMENT_PREVIEW_LENGTH
-                            ? rev.comment.slice(0, COMMENT_PREVIEW_LENGTH) + "..."
-                            : rev.comment}
-                    </Typography>
-
-                    <Button
-                        disabled={isSubmitting || isDeleting}
-                        onClick={() => {
-                            setIsEditDialogOpen(true);
-                            setEditedReviewId(rev.id);
-                            setEditedRating(rev.rating);
-                            setEditedComment(rev.comment);
-                            setEditedBookId(rev.bookId);
-                            setErrorEditing(null);
-                        }}
-                    >
-                        Edit review
-                    </Button>
-
-                    <Button
-                        disabled={isDeleting || isSubmitting}
-                        onClick={() => {
-                            setIsDeleteDialogOpen(true);
-                            setReviewIdToDelete(rev.id);
-                            setErrorDeleting(null);
-                        }}
-                    >
-                        Delete review
-                    </Button>
-                </Stack>
-            ))}
-
-
-        <Dialog
-            open={selectedReview !== null}
-            onClose={() => setSelectedReview(null)}
+    return (
+        <Box
+            sx={{
+                minHeight: '100vh',
+                background: 'linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%)',
+                pb: 6,
+            }}
         >
-            <DialogContent>
-                <Typography>{selectedReview?.comment}</Typography>
-            </DialogContent>
-        </Dialog>
-
-            <Dialog
-                open={isEditDialogOpen}
-                onClose={() => {
-                    setIsEditDialogOpen(false);
-                    setEditedReviewId(null);
-                    setEditedRating(null);
-                    setEditedComment(null);
-                    setEditedBookId(null);
-                    setErrorEditing(null);
-                }}
-            >
-                <DialogTitle>Edit review</DialogTitle>
-
-                <DialogContent>
-                    <InputLabel id="rating-select-label">Rating</InputLabel>
-                    <Select
-                        disabled={isSubmitting || isDeleting}
-                        labelId="rating-select-label"
-                        value={editedRating ?? ""}
-                        onChange={(e) => setEditedRating(Number(e.target.value))}
-                        fullWidth
-                    >
-                        {[1,2,3,4,5,6,7,8,9,10].map(v =>
-                            <MenuItem key={v} value={v}>{v}</MenuItem>
-                        )}
-                    </Select>
-
-                    {isRatingMissing && (
-                        <Typography color="error">
-                            Rating is required
+            <Container maxWidth="lg" sx={{ pt: 4 }}>
+                <Stack spacing={4}>
+                    {/* Header */}
+                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                fontWeight: 700,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                mb: 1,
+                            }}
+                        >
+                            My Reviews
                         </Typography>
-                    )}
-
-                    <TextField
-                        label="Review"
-                        multiline
-                        rows={4}
-                        value={editedComment ?? ""}
-                        onChange={(e) => setEditedComment(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                    />
-
-                    <Typography
-                        variant="body2"
-                        color={isCommentTooLong ? "error" : "text.secondary"}
-                    >
-                        {commentLength} / {MAX_COMMENT_LENGTH}
-                    </Typography>
-
-                    {isCommentTooLong && (
-                        <Typography color="error">
-                            Comment is too long
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                color: '#666',
+                                fontSize: '1.1rem',
+                            }}
+                        >
+                            Manage your book reviews and ratings
                         </Typography>
+                    </Box>
+
+                    {/* Loading State */}
+                    {loading && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+                            <Stack spacing={2} alignItems="center">
+                                <CircularProgress sx={{ color: '#667eea' }} />
+                                <Typography variant="h6" sx={{ color: '#667eea' }}>Loading your reviews...</Typography>
+                            </Stack>
+                        </Box>
                     )}
 
-                    {errorEditing && (
-                        <Typography color="error">{errorEditing}</Typography>
+                    {/* Error State */}
+                    {isError && !loading && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+                            <Typography variant="h6" sx={{ color: '#f44336' }}>Failed to load reviews</Typography>
+                        </Box>
                     )}
-                </DialogContent>
 
-                <DialogActions>
-                    <Button
-                        disabled={
-                            isSubmitting ||
-                            editedReviewId === null ||
-                            editedBookId === null ||
-                            isRatingMissing ||
-                            isCommentTooLong
-                        }
-                        onClick={async () => {
-                            if (
-                                editedReviewId === null ||
-                                editedRating === null ||
-                                editedBookId === null
-                            ) {
-                                return;
+                    {/* Empty State */}
+                    {!isError && !loading && myReviews.length === 0 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+                            <Stack spacing={2} alignItems="center">
+                                <Typography variant="h5" sx={{ color: '#999' }}>
+                                    You haven't reviewed any books yet
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#999' }}>
+                                    Start exploring books and share your thoughts!
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    )}
+
+                    {/* Reviews List */}
+                    {!isError && !loading && myReviews.length > 0 && (
+                        <Stack spacing={3}>
+                            {myReviews.map(review => (
+                                <ReviewCard
+                                    key={review.id}
+                                    review={review}
+                                    disabled={isSubmitting || isDeleting}
+                                    onEdit={() => {
+                                        setIsEditDialogOpen(true);
+                                        setEditedReviewId(review.id);
+                                        setEditedRating(review.rating);
+                                        setEditedComment(review.comment);
+                                        setEditedBookId(review.bookId);
+                                        setErrorEditing(null);
+                                    }}
+                                    onDelete={() => {
+                                        setIsDeleteDialogOpen(true);
+                                        setReviewIdToDelete(review.id);
+                                        setErrorDeleting(null);
+                                    }}
+                                    onViewComment={() => setSelectedReview(review)}
+                                />
+                            ))}
+                        </Stack>
+                    )}
+                </Stack>
+
+                {/* View Full Comment Dialog */}
+                <Dialog
+                    open={selectedReview !== null}
+                    onClose={() => setSelectedReview(null)}
+                    maxWidth="md"
+                    fullWidth
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                borderRadius: '16px',
+                                p: 2,
                             }
-                            setIsSubmitting(true);
-                            try {
-                                await updateReview({
-                                    rating: editedRating,
-                                    comment: editedComment,
-                                    bookId: editedBookId
-                                }, editedReviewId);
-                                setShouldRefetch(prev => !prev);
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 700,
+                        color: '#333',
+                    }}>
+                        Full Review
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography sx={{ color: '#666', fontStyle: 'italic', lineHeight: 1.8 }}>
+                            "{selectedReview?.comment}"
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => setSelectedReview(null)}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Edit Dialog */}
+                <Dialog
+                    open={isEditDialogOpen}
+                    onClose={() => {
+                        setIsEditDialogOpen(false);
+                        setEditedReviewId(null);
+                        setEditedRating(null);
+                        setEditedComment(null);
+                        setEditedBookId(null);
+                        setErrorEditing(null);
+                    }}
+                    maxWidth="sm"
+                    fullWidth
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                borderRadius: '16px',
+                                p: 2,
+                            }
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                    }}>
+                        Edit Your Review
+                    </DialogTitle>
+
+                    <DialogContent>
+                        <Stack spacing={3} sx={{ mt: 2 }}>
+                            <FormControl fullWidth>
+                                <InputLabel>Rating (1-10)</InputLabel>
+                                <Select
+                                    disabled={isSubmitting || isDeleting}
+                                    label="Rating (1-10)"
+                                    value={editedRating ?? ""}
+                                    onChange={(e) => setEditedRating(Number(e.target.value))}
+                                >
+                                    {[1,2,3,4,5,6,7,8,9,10].map(v =>
+                                        <MenuItem key={v} value={v}>{v}</MenuItem>
+                                    )}
+                                </Select>
+                                {isRatingMissing && (
+                                    <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                                        Rating is required
+                                    </Typography>
+                                )}
+                            </FormControl>
+
+                            <TextField
+                                label="Your Review (optional)"
+                                multiline
+                                rows={6}
+                                value={editedComment ?? ""}
+                                onChange={(e) => setEditedComment(e.target.value)}
+                                fullWidth
+                                disabled={isSubmitting || isDeleting}
+                            />
+
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: isCommentTooLong ? '#f44336' : '#999',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                {commentLength} / {MAX_COMMENT_LENGTH}
+                            </Typography>
+
+                            {isCommentTooLong && (
+                                <Typography color="error" variant="body2">
+                                    Comment is too long
+                                </Typography>
+                            )}
+
+                            {errorEditing && (
+                                <Typography color="error">{errorEditing}</Typography>
+                            )}
+                        </Stack>
+                    </DialogContent>
+
+                    <DialogActions sx={{ px: 3, pb: 2 }}>
+                        <Button
+                            disabled={isSubmitting || isDeleting}
+                            onClick={() => {
                                 setIsEditDialogOpen(false);
                                 setEditedReviewId(null);
                                 setEditedRating(null);
                                 setEditedComment(null);
                                 setEditedBookId(null);
                                 setErrorEditing(null);
-                            } catch (err) {
-                                if (err instanceof Error) {
-                                    setErrorEditing(err.message);
-                                } else {
-                                    setErrorEditing("Unexpected error");
-                                }
-                            } finally {
-                                setIsSubmitting(false);
+                            }}
+                            sx={{
+                                textTransform: 'none',
+                                color: '#666',
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            disabled={
+                                isSubmitting ||
+                                editedReviewId === null ||
+                                editedBookId === null ||
+                                isRatingMissing ||
+                                isCommentTooLong
                             }
-                        }}
-                    >
-                        {isSubmitting ? "Saving..." : "Edit review"}
-                    </Button>
+                            variant="contained"
+                            onClick={async () => {
+                                if (
+                                    editedReviewId === null ||
+                                    editedRating === null ||
+                                    editedBookId === null
+                                ) {
+                                    return;
+                                }
+                                setIsSubmitting(true);
+                                try {
+                                    await updateReview({
+                                        rating: editedRating,
+                                        comment: editedComment,
+                                        bookId: editedBookId
+                                    }, editedReviewId);
+                                    setShouldRefetch(prev => !prev);
+                                    setIsEditDialogOpen(false);
+                                    setEditedReviewId(null);
+                                    setEditedRating(null);
+                                    setEditedComment(null);
+                                    setEditedBookId(null);
+                                    setErrorEditing(null);
+                                } catch (err) {
+                                    if (err instanceof Error) {
+                                        setErrorEditing(err.message);
+                                    } else {
+                                        setErrorEditing("Unexpected error");
+                                    }
+                                } finally {
+                                    setIsSubmitting(false);
+                                }
+                            }}
+                            sx={{
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                textTransform: 'none',
+                                px: 3,
+                                fontWeight: 600,
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                }
+                            }}
+                        >
+                            {isSubmitting ? "Saving..." : "Save Changes"}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
-                    <Button
-                        disabled={isSubmitting || isDeleting}
-                        onClick={() => {
-                            setIsEditDialogOpen(false);
-                            setEditedReviewId(null);
-                            setEditedRating(null);
-                            setEditedComment(null);
-                            setEditedBookId(null);
-                            setErrorEditing(null);
-                        }}
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={() =>
-                {
-                    if (isDeleting) return;
-                    setIsDeleteDialogOpen(false);
-                    setReviewIdToDelete(null);
-                    setErrorDeleting(null);
-                }}
-            >
-                <DialogTitle>Delete review</DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete this review?
-                    </Typography>
-                    {errorDeleting && (
-                        <Typography color="error" sx={{mt: 1}}>
-                            {errorDeleting}
-                        </Typography>
-                    )}
-                    </DialogContent>
-                <DialogActions>
-                    <Button
-                        disabled={isDeleting || isSubmitting}
-                        onClick={() =>
-                    {
+                {/* Delete Confirmation Dialog */}
+                <Dialog
+                    open={isDeleteDialogOpen}
+                    onClose={() => {
+                        if (isDeleting) return;
                         setIsDeleteDialogOpen(false);
                         setReviewIdToDelete(null);
                         setErrorDeleting(null);
                     }}
-                    >Cancel</Button>
-                    <Button
-                    disabled={isDeleting || isSubmitting || reviewIdToDelete === null}
-                    onClick={async () => {
-                        if(reviewIdToDelete === null) return;
-                        setIsDeleting(true);
-                        try {
-                            await deleteReview(reviewIdToDelete);
-                            setShouldRefetch(prev => !prev);
-                            setIsDeleteDialogOpen(false);
-                            setReviewIdToDelete(null);
-                            setErrorDeleting(null);
-                        } catch (err) {
-                            if (err instanceof Error) {
-                                setErrorDeleting(err.message);
-                            }
-                            else {
-                                setErrorDeleting("Unexpected error");
+                    maxWidth="xs"
+                    fullWidth
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                borderRadius: '16px',
+                                p: 2,
                             }
                         }
-                        finally {
-                            setIsDeleting(false);
-                        }
-                    }}>
-                        {isDeleting ? "Deleting..." : "Delete review"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-    </>;
+                    }}
+                >
+                    <DialogTitle sx={{ fontSize: '1.3rem', fontWeight: 700, color: '#f44336' }}>
+                        Delete Review?
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography sx={{ color: '#666' }}>
+                            Are you sure you want to delete this review? This action cannot be undone.
+                        </Typography>
+                        {errorDeleting && (
+                            <Typography color="error" sx={{mt: 2}}>
+                                {errorDeleting}
+                            </Typography>
+                        )}
+                    </DialogContent>
+                    <DialogActions sx={{ px: 3, pb: 2 }}>
+                        <Button
+                            disabled={isDeleting || isSubmitting}
+                            onClick={() => {
+                                setIsDeleteDialogOpen(false);
+                                setReviewIdToDelete(null);
+                                setErrorDeleting(null);
+                            }}
+                            sx={{
+                                textTransform: 'none',
+                                color: '#666',
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            disabled={isDeleting || isSubmitting || reviewIdToDelete === null}
+                            variant="contained"
+                            onClick={async () => {
+                                if(reviewIdToDelete === null) return;
+                                setIsDeleting(true);
+                                try {
+                                    await deleteReview(reviewIdToDelete);
+                                    setShouldRefetch(prev => !prev);
+                                    setIsDeleteDialogOpen(false);
+                                    setReviewIdToDelete(null);
+                                    setErrorDeleting(null);
+                                } catch (err) {
+                                    if (err instanceof Error) {
+                                        setErrorDeleting(err.message);
+                                    }
+                                    else {
+                                        setErrorDeleting("Unexpected error");
+                                    }
+                                }
+                                finally {
+                                    setIsDeleting(false);
+                                }
+                            }}
+                            sx={{
+                                backgroundColor: '#f44336',
+                                textTransform: 'none',
+                                px: 3,
+                                fontWeight: 600,
+                                '&:hover': {
+                                    backgroundColor: '#d32f2f',
+                                }
+                            }}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Container>
+        </Box>
+    );
 }

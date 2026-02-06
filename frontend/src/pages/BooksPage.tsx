@@ -3,7 +3,7 @@ import {
     Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, InputLabel, MenuItem,
     Pagination, Select,
     Stack, TextField,
-    Typography,
+    Typography, Container,
 } from "@mui/material";
 import {type AuthorDTO} from "../api/authorsApi.ts";
 import {type Genre, GENRES} from "../types/Genre.ts";
@@ -21,19 +21,18 @@ type Title = string | null;
 
 
 
-
 export default function BooksPage() {
-    const [sortBy, setSortBy] = useState<SortField>("title"); // pole sortowania
-    const [order, setOrder] = useState<Order>("desc"); // kolejność sortowania
-    const [titleFilter, setTitleFilter] = useState<Title>(null); // tytuł, po którym filtrujemy
+    const [sortBy, setSortBy] = useState<SortField>("title");
+    const [order, setOrder] = useState<Order>("desc");
+    const [titleFilter, setTitleFilter] = useState<Title>(null);
     const [debounceTitleFilter, setDebounceTitleFilter] = useState<Title>(null);
-    const [genreFilter, setGenreFilter] = useState<Genre | null>(null); // gatunek, po którym filtrujemy
-    const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null); // autor po którym filtrujemy
-    const [selectedBookId, setSelectedBookId] = useState<number | null>(null); // id książki, którą będziemy oceniać
+    const [genreFilter, setGenreFilter] = useState<Genre | null>(null);
+    const [authorFilter, setAuthorFilter] = useState<AuthorDTO | null>(null);
+    const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
     const [rating, setRating] = useState<number | "">("");
     const [comment, setComment] = useState<string>("");
-    const [reviewError, setReviewError] = useState<string | null>(null); // ewentualny błąd przy tworzeniu recenzji
-    const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false); // true w trakcie wołania endpointu w backendzie.
+    const [reviewError, setReviewError] = useState<string | null>(null);
+    const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
 
 
     const {
@@ -61,7 +60,10 @@ export default function BooksPage() {
     useEffect(() => {
         const timeout = setTimeout(() => {
             setDebounceTitleFilter(titleFilter);
-        }, 100);
+            if (titleFilter !== debounceTitleFilter) {
+                resetPage();
+            }
+        }, 300);
         return () => clearTimeout(timeout);
     }, [titleFilter]);
 
@@ -73,104 +75,229 @@ export default function BooksPage() {
 
     return (
         <Box
-            sx={{flexGrow: 1, maxWidth: 550, mx: "auto"}}
+            sx={{
+                minHeight: '100vh',
+                background: 'linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%)',
+                pb: 6,
+            }}
         >
-            <Stack spacing={5}
-                   direction="row">
-                <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
-                    GoodReadsPL
-                </Typography>
-                <BooksFiltersBar loading={loading} isError={isError} authors={authors} authorFilter={authorFilter} authorInputValue={debounceAuthorInputValue} onAuthorChange={setAuthorFilter} onAuthorInputChange={setAuthorInputValue} genreFilter={genreFilter} genres={GENRES} onGenreChange={setGenreFilter} onTitleChange={setTitleFilter} sortBy={sortBy} order={order} onSortChange={setSortBy} onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))} pageSize={pageSize} onPageSizeChange={setPageSize} onPageReset={(resetPage)}></BooksFiltersBar>
-            </Stack>
-            <BooksListSection loading={loading} isError={isError} onRetry={retry} books={booksList} onAddReview={handleAddReview}></BooksListSection>
+            <Container maxWidth="lg" sx={{ pt: 4 }}>
+                <Stack spacing={4}>
+                    {/* Header */}
+                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                fontWeight: 700,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                mb: 1,
+                            }}
+                        >
+                            Discover Books
+                        </Typography>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                color: '#666',
+                                fontSize: '1.1rem',
+                            }}
+                        >
+                            Browse our collection and share your reviews
+                        </Typography>
+                    </Box>
+
+                    {/* Filters */}
+                    <BooksFiltersBar
+                        loading={loading}
+                        isError={isError}
+                        authors={authors}
+                        authorFilter={authorFilter}
+                        authorInputValue={debounceAuthorInputValue}
+                        onAuthorChange={setAuthorFilter}
+                        onAuthorInputChange={setAuthorInputValue}
+                        genreFilter={genreFilter}
+                        genres={GENRES}
+                        onGenreChange={setGenreFilter}
+                        titleFilter={titleFilter}
+                        onTitleChange={setTitleFilter}
+                        sortBy={sortBy}
+                        order={order}
+                        onSortChange={setSortBy}
+                        onToggleChange={() => setOrder(prev => (prev === "asc" ? "desc" : "asc"))}
+                        pageSize={pageSize}
+                        onPageSizeChange={setPageSize}
+                        onPageReset={resetPage}
+                    />
+
+                    {/* Books List */}
+                    <BooksListSection
+                        loading={loading}
+                        isError={isError}
+                        onRetry={retry}
+                        books={booksList}
+                        onAddReview={handleAddReview}
+                    />
+
+                    {/* Pagination */}
+                    {!loading && !isError && booksList.length > 0 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={currentPage + 1}
+                                onChange={(_, value) => setCurrentPage(value - 1)}
+                                size="large"
+                                sx={{
+                                    '& .MuiPaginationItem-root': {
+                                        fontSize: '1rem',
+                                        fontWeight: 600,
+                                        color: '#667eea',
+                                        '&.Mui-selected': {
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            color: '#fff',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                            }
+                                        },
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                        }
+                                    }
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Stack>
+
+                {/* Review Dialog */}
                 <Dialog
                     open={selectedBookId !== null}
                     onClose={() => setSelectedBookId(null)}
-                    sx={{mt: 2}}
-            >
-                    <DialogTitle> Add Review of a book You read! </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>Choose a rating and optionally add a written review.</DialogContentText>
-                        <Typography color="error">{reviewError}</Typography>
-                        <form
-                            onSubmit={ async (e) => {
-
-                                e.preventDefault(); // nie przeładowuje strony
-
-                                setIsSubmittingReview(true);
-                                try{
-                                        await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
-                                        resetPage();
-                                        retry();
-                                        setSelectedBookId(null);
-                                        setRating("");
-                                        setComment("");
-                                        setReviewError(null);
+                    maxWidth="sm"
+                    fullWidth
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                borderRadius: '16px',
+                                p: 2,
                             }
-
-                            catch (err) {
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                    }}>
+                        Add Your Review
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText sx={{ mb: 3, color: '#666' }}>
+                            Share your thoughts about this book
+                        </DialogContentText>
+                        {reviewError && (
+                            <Typography color="error" sx={{ mb: 2 }}>
+                                {reviewError}
+                            </Typography>
+                        )}
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
+                                setIsSubmittingReview(true);
+                                try {
+                                    await createReview({ rating: Number(rating), comment, bookId: selectedBookId! });
+                                    resetPage();
+                                    retry();
+                                    setSelectedBookId(null);
+                                    setRating("");
+                                    setComment("");
+                                    setReviewError(null);
+                                } catch (err) {
                                     if (err instanceof Error) {
                                         setReviewError(err.message);
                                     } else {
                                         setReviewError("Unexpected error");
                                     }
+                                } finally {
+                                    setIsSubmittingReview(false);
                                 }
-                                finally { setIsSubmittingReview(false); }
-                        }}
+                            }}
                             id="add-review-form"
                         >
-                            <InputLabel
-                            id="rating-select-label">Rating</InputLabel>
-                         <Select
-                             disabled={isSubmittingReview}
-                             required={true}
-                             labelId="rating-select-label"
-                             id="rating-select"
-                             value={rating}
-                             onChange={(e) => setRating(Number(e.target.value))}
-                         >
-                             <MenuItem value={1}>1</MenuItem>
-                             <MenuItem value={2}>2</MenuItem>
-                             <MenuItem value={3}>3</MenuItem>
-                             <MenuItem value={4}>4</MenuItem>
-                             <MenuItem value={5}>5</MenuItem>
-                             <MenuItem value={6}>6</MenuItem>
-                             <MenuItem value={7}>7</MenuItem>
-                             <MenuItem value={8}>8</MenuItem>
-                             <MenuItem value={9}>9</MenuItem>
-                             <MenuItem value={10}>10</MenuItem>
-                         </Select>
+                            <InputLabel id="rating-select-label" sx={{ mb: 1, fontWeight: 600 }}>
+                                Rating (1-10)
+                            </InputLabel>
+                            <Select
+                                disabled={isSubmittingReview}
+                                required={true}
+                                labelId="rating-select-label"
+                                id="rating-select"
+                                value={rating}
+                                onChange={(e) => setRating(Number(e.target.value))}
+                                fullWidth
+                                sx={{ mb: 3 }}
+                            >
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                                    <MenuItem key={num} value={num}>{num}</MenuItem>
+                                ))}
+                            </Select>
 
                             <TextField
                                 disabled={isSubmittingReview}
                                 id="review-field"
-                                label="Review"
+                                label="Your Review (optional)"
                                 multiline
                                 rows={4}
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
+                                fullWidth
+                                sx={{ mb: 3 }}
+                            />
 
-                            >
-
-                            </TextField>
+                            <Stack direction="row" spacing={2} justifyContent="flex-end">
+                                <Button
+                                    onClick={() => {
+                                        setSelectedBookId(null);
+                                        setRating("");
+                                        setReviewError(null);
+                                    }}
+                                    sx={{
+                                        textTransform: 'none',
+                                        color: '#666',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                        }
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    disabled={isSubmittingReview}
+                                    form="add-review-form"
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        textTransform: 'none',
+                                        px: 4,
+                                        fontWeight: 600,
+                                        '&:hover': {
+                                            background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                        }
+                                    }}
+                                >
+                                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                                </Button>
+                            </Stack>
                         </form>
                     </DialogContent>
-                    <Button onClick = {() => {setSelectedBookId(null); setRating("");setReviewError(null);}}>Cancel</Button>
-                    <Button
-                        disabled={isSubmittingReview}
-                        form="add-review-form" type="submit">Submit</Button>
                 </Dialog>
-        <Stack spacing={2}>
-            <Pagination
-                disabled={loading}
-                count={totalPages}
-                page={currentPage + 1}
-                onChange={(_, value) => setCurrentPage(value - 1)}
-                variant="outlined"
-                color="primary"
-            ></Pagination>
-        </Stack>
+            </Container>
         </Box>
-
-    )
+    );
 }
