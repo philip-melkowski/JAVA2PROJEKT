@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.AuthorNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookAlreadyExistsException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
+import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
 import pl.melkowskiphilip.GoodReadsPL.specification.BookSpecification;
 
 import java.util.Set;
@@ -29,6 +31,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     /* =========================================================
        =============== DEPRECATED – NIE UŻYWANE =================
@@ -184,11 +187,17 @@ public class BookService {
 
     @Transactional
     public void deleteById(Long id) {
-        try {
-            bookRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new BookNotFoundException("error.book.notfound");
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("error.book.notfound"));
+
+        // 1) Odpięcie z tabeli users_books_read (owning side = User.readBooks)
+        for (User u : Set.copyOf(book.getReaders())) {
+            u.getReadBooks().remove(book);
         }
+        book.getReaders().clear();
+
+        // 2) Usunięcie książki
+        bookRepository.delete(book);
     }
 
     // MAPOWANIE DO DTO
