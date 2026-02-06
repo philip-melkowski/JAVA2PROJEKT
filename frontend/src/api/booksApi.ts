@@ -47,15 +47,7 @@
         return apiFetch(`api/books/search?${query.toString()}`);
     }
 
-    export function getBooksAdmin(params: {
-        page: number;
-        size: number;
-        sortBy: string;
-        order: "asc" | "desc";
-        genre?: string;
-        authorId?: number;
-        title?: string;
-    }) : Promise<Page<BookDTO>> {
+    export function getBooksAdmin(params: BookSearchParams) : Promise<Page<BookDTO>> {
         const qs = new URLSearchParams();
         qs.set("page", String(params.page));
         qs.set("size", String(params.size));
