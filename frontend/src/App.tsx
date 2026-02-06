@@ -6,6 +6,8 @@ import {useAuth} from "./auth/AuthContext.tsx";
 import BooksPage from "./pages/BooksPage.tsx";
 import MyReviewsPage from "./pages/MyReviewsPage.tsx";
 import Navbar from "./components/Navbar.tsx";
+import ManageBooksPage from "./pages/ManageBooksPage.tsx";
+import AdminRoute from "./auth/AdminRoute.tsx";
 
 
 function App() {
@@ -30,6 +32,14 @@ function App() {
               </ProtectedRoute>
           }
           />
+
+          <Route path="/admin/manageBooks" element={
+              <AdminRoute>
+                  <ManageBooksPage></ManageBooksPage>
+              </AdminRoute>
+          }
+          />
+
             <Route path="/books" element={
                 <ProtectedRoute>
                     <BooksPage></BooksPage>
