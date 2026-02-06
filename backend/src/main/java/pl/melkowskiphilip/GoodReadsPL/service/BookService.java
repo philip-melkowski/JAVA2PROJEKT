@@ -108,6 +108,35 @@ public class BookService {
     }
 
 
+    public Page<BookDTO> searchBooksAdmin(
+            int page,
+            int size,
+            String sortBy,
+            String order,
+            Genre genre,
+            Long authorId,
+            String title
+    ) {
+        // 🔒 zabezpieczenie – averageRating NIE jest polem encji
+        if ("averageRating".equals(sortBy)) {
+            sortBy = "title";
+        }
+
+        Sort sort = order.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        var specification = BookSpecification
+                .hasGenre(genre)
+                .and(BookSpecification.hasAuthor(authorId))
+                .and(BookSpecification.titleContains(title));
+
+        return bookRepository.findAll(specification, pageable)
+                .map(this::toDTO);
+    }
+
 
     // CRUD
 
