@@ -6,7 +6,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,18 +13,20 @@ import pl.melkowskiphilip.GoodReadsPL.dto.BookDTO;
 import pl.melkowskiphilip.GoodReadsPL.entity.Author;
 import pl.melkowskiphilip.GoodReadsPL.entity.Book;
 import pl.melkowskiphilip.GoodReadsPL.entity.Genre;
+import pl.melkowskiphilip.GoodReadsPL.entity.User;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.AuthorNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookAlreadyExistsException;
 import pl.melkowskiphilip.GoodReadsPL.exception.custom.BookNotFoundException;
 import pl.melkowskiphilip.GoodReadsPL.repository.AuthorRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
+import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
+
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +38,12 @@ class BookServiceTest {
 
     @Mock
     private AuthorRepository authorRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
+
+
+
 
     @InjectMocks
     private BookService bookService;
@@ -60,6 +67,7 @@ class BookServiceTest {
 
         Page<Book> page = new PageImpl<>(List.of(book));
 
+        when(reviewRepository.findReviewedBooksIdsByUserId(1L)).thenReturn(List.of());
         when(bookRepository.findAll(
                 ArgumentMatchers.<org.springframework.data.jpa.domain.Specification<Book>>any(),
                 any(Pageable.class)
@@ -73,13 +81,12 @@ class BookServiceTest {
                 "asc",
                 Genre.FANTASY,
                 1L,
-                "Pan"
+                "Pan",
+                1L
         );
 
         assertEquals(1, result.getTotalElements());
         assertEquals("Pan Tadeusz", result.getContent().get(0).getTitle());
-
-
     }
 
     /* =========================
@@ -123,6 +130,8 @@ class BookServiceTest {
     void shouldSaveBookWhenNotExists() {
         Author author = new Author();
         author.setId(1L);
+        author.setName("Adam");
+        author.setSurname("Mickiewicz");
 
         BookDTO dto = new BookDTO();
         dto.setTitle("Pan Tadeusz");
@@ -178,6 +187,8 @@ class BookServiceTest {
     void shouldUpdateBookWhenExists() {
         Author author = new Author();
         author.setId(1L);
+        author.setName("Adam");
+        author.setSurname("Mickiewicz");
 
         Book book = new Book();
         book.setId(1L);
@@ -209,20 +220,41 @@ class BookServiceTest {
     /* =========================
        deleteById()
        ========================= */
-
     @Test
     void shouldDeleteBookWhenExists() {
-        doNothing().when(bookRepository).deleteById(1L);
+        Book book = new Book();
+        book.setId(1L);
+
+        User u1 = new User();
+        u1.setId(10L);
+        u1.setReadBooks(new java.util.HashSet<>());
+
+        User u2 = new User();
+        u2.setId(11L);
+        u2.setReadBooks(new java.util.HashSet<>());
+
+        // Dodajemy książkę do kolekcji użytkowników
+        u1.getReadBooks().add(book);
+        u2.getReadBooks().add(book);
+
+        // Ustawiamy readers dla książki
+        book.setReaders(new java.util.HashSet<>(Set.of(u1, u2)));
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        doNothing().when(bookRepository).delete(book);
 
         bookService.deleteById(1L);
 
-        verify(bookRepository).deleteById(1L);
-    }
+        verify(bookRepository).delete(book);
 
+        // Sprawdzamy czy użytkownicy zostali odpięci od książki
+        assertTrue(u1.getReadBooks().isEmpty());
+        assertTrue(u2.getReadBooks().isEmpty());
+        assertTrue(book.getReaders().isEmpty());
+    }
     @Test
     void shouldThrowWhenDeletingNonExistingBook() {
-        doThrow(new EmptyResultDataAccessException(1))
-                .when(bookRepository).deleteById(1L);
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
                 () -> bookService.deleteById(1L));

@@ -13,6 +13,7 @@ import pl.melkowskiphilip.GoodReadsPL.exception.custom.*;
 import pl.melkowskiphilip.GoodReadsPL.repository.BookRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.ReviewRepository;
 import pl.melkowskiphilip.GoodReadsPL.repository.UserRepository;
+import pl.melkowskiphilip.GoodReadsPL.entity.Author;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -46,15 +48,20 @@ class ReviewServiceTest {
         user.setId(1L);
         user.setUsername("user");
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setId(1L);
         book.setTitle("Book");
+        book.setAuthor(author);  // ✅ Dodany autor
 
         Review review = new Review();
         review.setUser(user);
         review.setBook(book);
         review.setRating(5);
-
 
         when(reviewRepository.findAll()).thenReturn(List.of(review));
 
@@ -74,9 +81,15 @@ class ReviewServiceTest {
         user.setUsername("user");
         user.setId(1L);
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setTitle("Book");
         book.setId(1L);
+        book.setAuthor(author);  // ✅ Dodany autor
 
         review.setUser(user);
         review.setBook(book);
@@ -107,7 +120,6 @@ class ReviewServiceTest {
     void shouldSaveReviewWhenNotExists() {
         ReviewDTO dto = new ReviewDTO();
         dto.setBookId(1L);
-        dto.setUserId(1L);
         dto.setRating(4);
         dto.setComment("OK");
 
@@ -116,9 +128,15 @@ class ReviewServiceTest {
         user.setUsername("user");
         user.setReadBooks(new java.util.HashSet<>());
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setId(1L);
         book.setTitle("Book");
+        book.setAuthor(author);  // ✅ Dodany autor
         book.setReaders(new java.util.HashSet<>());
         book.setReviews(new java.util.ArrayList<>());
 
@@ -133,7 +151,7 @@ class ReviewServiceTest {
         when(reviewRepository.existsByBookIdAndUserId(1L, 1L)).thenReturn(false);
         when(reviewRepository.save(any(Review.class))).thenReturn(saved);
 
-        ReviewDTO result = reviewService.saveReview(dto);
+        ReviewDTO result = reviewService.saveReview(dto, 1L);
 
         assertEquals(4, result.getRating());
         verify(userRepository).save(user);
@@ -143,14 +161,13 @@ class ReviewServiceTest {
     void shouldThrowExceptionWhenReviewAlreadyExists() {
         ReviewDTO dto = new ReviewDTO();
         dto.setBookId(1L);
-        dto.setUserId(1L);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(new Book()));
         when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         when(reviewRepository.existsByBookIdAndUserId(1L, 1L)).thenReturn(true);
 
         assertThrows(ReviewAlreadyExistsException.class,
-                () -> reviewService.saveReview(dto));
+                () -> reviewService.saveReview(dto, 1L));
 
         verify(reviewRepository, never()).save(any());
     }
@@ -162,7 +179,6 @@ class ReviewServiceTest {
     @Test
     void shouldUpdateReviewWhenExists() {
         ReviewDTO dto = new ReviewDTO();
-        dto.setId(1L);
         dto.setRating(5);
         dto.setComment("Updated");
 
@@ -173,9 +189,15 @@ class ReviewServiceTest {
         user.setUsername("user");
         user.setId(1L);
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setTitle("Book");
         book.setId(1L);
+        book.setAuthor(author);  // ✅ Dodany autor
 
         existing.setUser(user);
         existing.setBook(book);
@@ -183,7 +205,7 @@ class ReviewServiceTest {
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(reviewRepository.save(any(Review.class))).thenReturn(existing);
 
-        ReviewDTO result = reviewService.updateReview(dto);
+        ReviewDTO result = reviewService.updateReview(dto, 1L, 1L);
 
         assertEquals(5, result.getRating());
     }
@@ -193,7 +215,7 @@ class ReviewServiceTest {
         ReviewDTO dto = new ReviewDTO();
 
         assertThrows(InvalidReviewIdException.class,
-                () -> reviewService.updateReview(dto));
+                () -> reviewService.updateReview(dto, null, 1L));
     }
 
     /* =========================
@@ -206,12 +228,19 @@ class ReviewServiceTest {
         user.setId(1L);
         user.setReadBooks(new java.util.HashSet<>());
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setId(1L);
+        book.setAuthor(author);  // ✅ Dodany autor
         book.setReaders(new java.util.HashSet<>());
         book.setReviews(new java.util.ArrayList<>());
 
         Review review = new Review();
+        review.setId(1L);
         review.setUser(user);
         review.setBook(book);
 
@@ -221,7 +250,7 @@ class ReviewServiceTest {
 
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
 
-        reviewService.deleteById(1L);
+        reviewService.deleteById(1L, 1L);
 
         verify(userRepository).save(user);
         verify(reviewRepository).delete(review);
@@ -240,9 +269,15 @@ class ReviewServiceTest {
         user.setUsername("user");
         user.setId(1L);
 
+        Author author = new Author();
+        author.setId(1L);
+        author.setName("John");
+        author.setSurname("Doe");
+
         Book book = new Book();
         book.setTitle("Book");
         book.setId(1L);
+        book.setAuthor(author);  // ✅ Dodany autor
 
         review.setUser(user);
         review.setBook(book);
