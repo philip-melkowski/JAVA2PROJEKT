@@ -7,6 +7,7 @@ type AuthContextType = {
     token: string | null;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
+    role: string | null;
     logout: () => void;
 };
 
@@ -17,17 +18,22 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = (props: {children: ReactNode}) =>{
     const children = props.children;
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+    const [role, setRole] = useState<string | null>(localStorage.getItem("role"));
 
 
     const loginUser = async (email: string, password: string) => {
         const result = await login(email, password);
+        setRole(result.role);
+        localStorage.setItem("role", result.role);
         setToken(result.token);
         localStorage.setItem("token", result.token);
     }
 
     const logoutUser = () => {
-        setToken(null);
+        setToken(null)
+        setRole(null);
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
     }
 
     useEffect(() => {
@@ -38,6 +44,7 @@ export const AuthProvider = (props: {children: ReactNode}) =>{
         <AuthContext.Provider value={{
             token,
             isAuthenticated: !!token, // !! oznacza - boolowska wersja wartości - czy token istnieje.
+            role: role,
             login: loginUser,
             logout: logoutUser}}>
             {children}
