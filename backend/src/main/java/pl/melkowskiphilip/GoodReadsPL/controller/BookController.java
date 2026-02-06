@@ -84,7 +84,20 @@ public class BookController {
     }
 
 
-
+    @GetMapping("/admin/search")
+    public ResponseEntity<Page<BookDTO>> searchBooksAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) Genre genre,
+            @RequestParam(required = false) Long authorId,
+            @RequestParam(required = false) String title
+    ) {
+        return ResponseEntity.ok(
+                bookService.searchBooksAdmin(page, size, sortBy, order, genre, authorId, title)
+        );
+    }
     // CRUD
 
 
